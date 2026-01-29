@@ -1,4 +1,5 @@
 package com.example.cobainui
+
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -12,8 +13,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -35,13 +42,26 @@ class MainActivity : AppCompatActivity() {
         )
         titleTextView.text = spannable
 
+        // Initialize Firebase Auth
+        auth = Firebase.auth
+
         // Handler to post a delayed action
         Handler(Looper.getMainLooper()).postDelayed({
-            // Create an Intent to start OnboardingActivity
-            val intent = Intent(this, OnboardingActivity::class.java)
-            startActivity(intent)
+            // Check if user is signed in (non-null)
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                // User is already logged in, go to HomeActivity
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            } else {
+                // User is not logged in, go to OnboardingActivity
+                val intent = Intent(this, OnboardingActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            }
             // Finish MainActivity so the user can't go back to it
             finish()
-        }, 3000) // 3000 milliseconds = 3 seconds
+        }, 3000) // 3 seconds delay
     }
 }
