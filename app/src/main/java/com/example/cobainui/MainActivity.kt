@@ -1,5 +1,6 @@
 package com.example.cobainui
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -11,18 +12,25 @@ import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sharedPref = getSharedPreferences("SettingsPref", MODE_PRIVATE)
+        val isDarkMode = sharedPref.getBoolean("isDarkMode", false)
+
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -42,25 +50,19 @@ class MainActivity : AppCompatActivity() {
         )
         titleTextView.text = spannable
 
-        // Initialize Firebase Auth
-        auth = Firebase.auth
-
-        // Handler to post a delayed action
         Handler(Looper.getMainLooper()).postDelayed({
-            // Check if user is signed in (non-null)
-            val currentUser = auth.currentUser
-            if (currentUser != null) {
-                // User is already logged in, go to HomeActivity
+            val user = FirebaseAuth.getInstance().currentUser
+            val sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+            val skippedLogin = sharedPreferences.getBoolean("skipped_login", false)
+
+            if (user != null || skippedLogin) {
                 val intent = Intent(this, HomeActivity::class.java)
                 startActivity(intent)
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             } else {
-                // User is not logged in, go to OnboardingActivity
                 val intent = Intent(this, OnboardingActivity::class.java)
                 startActivity(intent)
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             }
-            // Finish MainActivity so the user can't go back to it
             finish()
         }, 3000) // 3 seconds delay
     }

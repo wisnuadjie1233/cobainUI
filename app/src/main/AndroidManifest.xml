@@ -21,6 +21,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".NotificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".OnboardingActivity"
             android:exported="false" />
         <activity
@@ -31,6 +34,9 @@
             android:exported="false" />
         <activity
             android:name=".ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SettingsActivity"
             android:exported="false" />
         <activity
             android:name=".ResetPasswordActivity"

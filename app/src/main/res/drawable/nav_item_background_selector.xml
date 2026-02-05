@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- State ketika item dipilih (selected) -->
+    <item android:state_selected="true">
+        <shape android:shape="oval">
+            <solid android:color="#FF6F00" /> <!-- Warna oranye -->
+        </shape>
+    </item>
+
+    <!-- State ketika item ditekan (pressed) -->
+    <item android:state_pressed="true">
+        <shape android:shape="oval">
+            <solid android:color="#4DFF6F00" /> <!-- Warna oranye transparan untuk efek ditekan -->
+        </shape>
+    </item>
+
+    <!-- State default (tidak dipilih dan tidak ditekan) -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" /> <!-- Background transparan -->
+        </shape>
+    </item>
+
+</selector>

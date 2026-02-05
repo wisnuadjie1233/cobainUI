@@ -1,101 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1C1E"
-    android:fillViewport="true"
+    android:background="?android:attr/windowBackground"
     android:fitsSystemWindows="true"
     tools:context=".HomeActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="100dp">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Header -->
-        <ImageView
-            android:id="@+id/user_avatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/ic_user_avatar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/welcome_message"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Selamat Pagi, Dewa!"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@+id/user_avatar"
-            app:layout_constraintTop_toTopOf="@+id/user_avatar"
-            app:layout_constraintBottom_toBottomOf="@+id/user_avatar"/>
+            android:paddingBottom="24dp">
 
-        <ImageView
-            android:id="@+id/notification_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_notification"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/user_avatar"
-            app:layout_constraintBottom_toBottomOf="@+id/user_avatar"/>
+            <!-- Header -->
+            <ImageView
+                android:id="@+id/user_avatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/person"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?android:attr/textColorPrimary"/>
 
-        <ImageView
-            android:id="@+id/crown_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_crown"
-            app:layout_constraintEnd_toStartOf="@+id/notification_icon"
-            app:layout_constraintTop_toTopOf="@+id/user_avatar"
-            app:layout_constraintBottom_toBottomOf="@+id/user_avatar"/>
+            <TextView
+                android:id="@+id/greeting_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Selamat Pagi Dewa!"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/spacelight"
+                app:layout_constraintStart_toEndOf="@+id/user_avatar"
+                app:layout_constraintTop_toTopOf="@+id/user_avatar"
+                app:layout_constraintBottom_toBottomOf="@+id/user_avatar" />
 
-        <!-- Date Picker -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/date_recycler_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_avatar"
-            tools:listitem="@layout/item_date"
-            tools:itemCount="7"/>
+            <ImageView
+                android:id="@+id/notification_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:src="@drawable/lonceng_notif"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/user_avatar"
+                app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
+                app:tint="?android:attr/textColorPrimary" />
 
-        <!-- Calories Section -->
-        <TextView
-            android:id="@+id/kalori_harian_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:text="Kalori Harian Anda"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/date_recycler_view" />
+            <!-- Date Picker -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/date_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="24dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                app:cardCornerRadius="16dp"
+                app:layout_constraintTop_toBottomOf="@+id/user_avatar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:strokeWidth="0dp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/calories_card"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="#6A5AE0"
-            app:cardCornerRadius="20dp"
-            app:layout_constraintTop_toBottomOf="@+id/kalori_harian_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/date_recycler_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="7"
+                    tools:listitem="@layout/date_item_layout" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Calories Section -->
+            <TextView
+                android:id="@+id/kalori_harian_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="Kalori Harian Anda"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/spacelight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/date_card" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/calories_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                app:cardBackgroundColor="#CDB4DB"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintTop_toBottomOf="@+id/kalori_harian_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -106,26 +124,57 @@
                     android:id="@+id/total_kalori_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/spacelight"
                     android:text="Total Kalori"
-                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <!-- 1. BAR BAWAH (WADAH SETENGAH LINGKARAN) -->
+                <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                    android:id="@+id/calories_background_bar"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="16dp"
+                    app:cpb_background_progressbar_color="@android:color/transparent"
+                    app:cpb_progress="50"
+                    app:cpb_progress_max="100"
+                    app:cpb_progressbar_color="#E1CDEE"
+                    app:cpb_progressbar_width="20dp"
+                    app:cpb_round_border="true"
+                    app:cpb_start_angle="270"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/total_kalori_label" />
+
+                <!-- 2. BAR ATAS (INDIKATOR HITAM) -->
                 <com.mikhaellopez.circularprogressbar.CircularProgressBar
                     android:id="@+id/calories_progress_bar"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    app:cpb_background_progressbar_color="@android:color/transparent"
+                    app:cpb_progress="30"
+                    app:cpb_progress_max="100"
+                    app:cpb_progressbar_color="#000000"
+                    app:cpb_progressbar_width="20dp"
+                    app:cpb_round_border="true"
+                    app:cpb_start_angle="270"
+                    app:layout_constraintBottom_toBottomOf="@id/calories_background_bar"
+                    app:layout_constraintEnd_toEndOf="@id/calories_background_bar"
+                    app:layout_constraintStart_toStartOf="@id/calories_background_bar"
+                    app:layout_constraintTop_toTopOf="@id/calories_background_bar" />
+
+                <View
+                    android:id="@+id/calories_text_background"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
-                    app:cpb_background_progressbar_color="#B3AEEA"
-                    app:cpb_background_progressbar_width="15dp"
-                    app:cpb_progress="65"
-                    app:cpb_progress_direction="to_right"
-                    app:cpb_progressbar_color="#000000"
-                    app:cpb_progressbar_width="15dp"
-                    app:cpb_round_border="true"
-                    app:layout_constraintTop_toBottomOf="@+id/total_kalori_label"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginTop="16dp"/>
+                    android:background="@drawable/circle_background_soft"
+                    app:layout_constraintBottom_toBottomOf="@+id/calories_progress_bar"
+                    app:layout_constraintEnd_toEndOf="@+id/calories_progress_bar"
+                    app:layout_constraintStart_toStartOf="@+id/calories_progress_bar"
+                    app:layout_constraintTop_toTopOf="@+id/calories_progress_bar"
+                    app:layout_constraintVertical_bias="0.45" />
 
                 <TextView
                     android:id="@+id/calories_text"
@@ -133,365 +182,240 @@
                     android:layout_height="wrap_content"
                     android:text="1672"
                     android:textColor="#000000"
-                    android:textSize="34sp"
+                    android:textSize="24sp"
+                    android:fontFamily="@font/spacelight"
                     android:textStyle="bold"
-                    app:layout_constraintVertical_chainStyle="packed"
-                    app:layout_constraintTop_toTopOf="@+id/calories_progress_bar"
-                    app:layout_constraintBottom_toTopOf="@+id/kalori_label_in_progress"
-                    app:layout_constraintStart_toStartOf="@+id/calories_progress_bar"
-                    app:layout_constraintEnd_toEndOf="@+id/calories_progress_bar"/>
+                    app:layout_constraintBottom_toBottomOf="@+id/calories_text_background"
+                    app:layout_constraintEnd_toEndOf="@+id/calories_text_background"
+                    app:layout_constraintHorizontal_bias="0.494"
+                    app:layout_constraintStart_toStartOf="@+id/calories_text_background"
+                    app:layout_constraintTop_toTopOf="@+id/calories_text_background"
+                    app:layout_constraintVertical_bias="0.372" />
 
-                 <TextView
+                <TextView
                     android:id="@+id/kalori_label_in_progress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Kalori"
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    app:layout_constraintTop_toBottomOf="@+id/calories_text"
-                    app:layout_constraintBottom_toBottomOf="@+id/calories_progress_bar"
-                    app:layout_constraintStart_toStartOf="@+id/calories_progress_bar"
-                    app:layout_constraintEnd_toEndOf="@+id/calories_progress_bar"/>
+                    android:fontFamily="@font/spacelight"
+                    app:layout_constraintEnd_toEndOf="@+id/calories_text"
+                    app:layout_constraintStart_toStartOf="@+id/calories_text"
+                    app:layout_constraintTop_toBottomOf="@+id/calories_text" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        <!-- Nutrients Section -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/carbs_card"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="#F5DD2F"
-            app:cardCornerRadius="20dp"
-            app:layout_constraintTop_toBottomOf="@+id/calories_card"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/protein_card">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
+            <GridLayout
+                android:id="@+id/nutrients_grid"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:layout_marginTop="16dp"
+                android:columnCount="2"
+                android:rowCount="1"
+                app:layout_constraintTop_toBottomOf="@+id/calories_card"
+                app:layout_constraintStart_toStartOf="@+id/calories_card"
+                app:layout_constraintEnd_toEndOf="@+id/calories_card">
 
-                <ImageView
-                    android:id="@+id/carbs_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_carbs"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <TextView
-                    android:id="@+id/carbs_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Karbohidrat"
-                    android:textColor="#000000"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/carbs_icon"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <ProgressBar
-                    android:id="@+id/carbs_progress"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                <!-- CARD 1: KARBOHIDRAT -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/carbs_card"
                     android:layout_width="0dp"
-                    android:layout_height="8dp"
-                    android:progress="70"
-                    android:progressDrawable="@drawable/custom_progress_bar_yellow"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@+id/carbs_label"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <TextView
-                    android:id="@+id/carbs_value"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="140g"
-                    android:textColor="#000000"
-                    app:layout_constraintTop_toBottomOf="@+id/carbs_progress"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="#F5F378"
+                    app:cardCornerRadius="20dp"
+                    app:strokeWidth="0dp">
 
-                <TextView
-                    android:id="@+id/carbs_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="200g"
-                    android:textColor="#000000"
-                    app:layout_constraintTop_toBottomOf="@+id/carbs_progress"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
+                        <ImageView
+                            android:id="@+id/carbs_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/karbo"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+                        <TextView
+                            android:id="@+id/carbs_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Karbohidrat"
+                            android:textColor="#000000"
+                            android:fontFamily="@font/spacelight"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toBottomOf="@+id/carbs_icon"
+                            app:layout_constraintStart_toStartOf="parent" />
+                        <ProgressBar
+                            android:id="@+id/carbs_progress"
+                            style="@android:style/Widget.ProgressBar.Horizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="8dp"
+                            android:progress="70"
+                            android:progressDrawable="@drawable/custom_progress_bar_yellow"
+                            android:progressBackgroundTint="#D4C65D"
+                            app:layout_constraintTop_toBottomOf="@+id/carbs_label"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                        <TextView
+                            android:id="@+id/carbs_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="140g"
+                            android:textColor="#000000"
+                            app:layout_constraintTop_toBottomOf="@+id/carbs_progress"
+                            app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/protein_card"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="#4CAF50"
-            app:cardCornerRadius="20dp"
-            app:layout_constraintTop_toTopOf="@+id/carbs_card"
-            app:layout_constraintBottom_toBottomOf="@+id/carbs_card"
-            app:layout_constraintStart_toEndOf="@+id/carbs_card"
-            app:layout_constraintEnd_toEndOf="parent">
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
+                </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:id="@+id/protein_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_protein"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <TextView
-                    android:id="@+id/protein_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Protein"
-                    android:textColor="#000000"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/protein_icon"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <ProgressBar
-                    android:id="@+id/protein_progress"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                <!-- CARD 2: PROTEIN -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/protein_card"
                     android:layout_width="0dp"
-                    android:layout_height="8dp"
-                    android:progress="50"
-                    android:progressDrawable="@drawable/custom_progress_bar_green"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@+id/protein_label"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <TextView
-                    android:id="@+id/protein_value"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="60g"
-                    android:textColor="#000000"
-                    app:layout_constraintTop_toBottomOf="@+id/protein_progress"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardBackgroundColor="#45C588"
+                    app:cardCornerRadius="20dp"
+                    app:strokeWidth="0dp">
 
-                <TextView
-                    android:id="@+id/protein_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="120g"
-                    android:textColor="#000000"
-                    app:layout_constraintTop_toBottomOf="@+id/protein_progress"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                        <ImageView
+                            android:id="@+id/protein_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/protein"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+                        <TextView
+                            android:id="@+id/protein_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Protein"
+                            android:textColor="#000000"
+                            android:fontFamily="@font/spacelight"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toBottomOf="@+id/protein_icon"
+                            app:layout_constraintStart_toStartOf="parent" />
+                        <ProgressBar
+                            android:id="@+id/protein_progress"
+                            style="@android:style/Widget.ProgressBar.Horizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="8dp"
+                            android:progress="50"
+                            android:progressDrawable="@drawable/custom_progress_bar_green"
+                            app:layout_constraintTop_toBottomOf="@+id/protein_label"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                        <TextView
+                            android:id="@+id/protein_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="60g"
+                            android:textColor="#000000"
+                            app:layout_constraintTop_toBottomOf="@+id/protein_progress"
+                            app:layout_constraintStart_toStartOf="parent" />
 
-        </com.google.android.material.card.MaterialCardView>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-         <!-- Riwayat Analisis -->
-        <TextView
-            android:id="@+id/riwayat_analisis_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:text="Riwayat Analisis"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/carbs_card" />
+                </com.google.android.material.card.MaterialCardView>
+
+            </GridLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottom_navigation_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:cardCornerRadius="35dp"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:strokeWidth="0dp">
 
         <LinearLayout
-            android:id="@+id/history_container"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/riwayat_analisis_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
+            android:id="@+id/icons_container"
+            android:layout_width="288dp"
+            android:layout_height="53dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp">
 
-            <!-- History Item 1 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="#2C2C2E"
-                app:cardCornerRadius="12dp">
+            <ImageView
+                android:id="@+id/nav_home_icon"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/nav_item_background_selector"
+                android:padding="10dp"
+                android:src="@drawable/home"
+                app:tint="@color/nav_icon_color_selector" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
+            <ImageView
+                android:id="@+id/nav_ai_icon"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/nav_item_background_selector"
+                android:padding="10dp"
+                android:src="@drawable/scan"
+                app:tint="@color/nav_icon_color_selector" />
 
-                    <ImageView
-                        android:id="@+id/history_icon_1"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_carbs"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+            <ImageView
+                android:id="@+id/nav_scan_icon"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/nav_item_background_selector"
+                android:padding="10dp"
+                android:src="@drawable/statisktik"
+                app:tint="@color/nav_icon_color_selector" />
 
-                    <TextView
-                        android:id="@+id/history_title_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nasi Goreng"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginStart="16dp"
-                        app:layout_constraintStart_toEndOf="@id/history_icon_1"
-                        app:layout_constraintTop_toTopOf="@id/history_icon_1" />
+            <ImageView
+                android:id="@+id/nav_history_icon"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/nav_item_background_selector"
+                android:padding="10dp"
+                android:src="@drawable/edukasi"
+                app:tint="@color/nav_icon_color_selector" />
 
-                    <TextView
-                        android:id="@+id/history_subtitle_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="530 Kalori"
-                        android:textColor="#EBEBF5"
-                        android:textSize="14sp"
-                        app:layout_constraintStart_toStartOf="@id/history_title_1"
-                        app:layout_constraintTop_toBottomOf="@id/history_title_1" />
+            <ImageView
+                android:id="@+id/nav_settings_icon"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/nav_item_background_selector"
+                android:padding="10dp"
+                android:src="@drawable/settings"
+                app:tint="@color/nav_icon_color_selector" />
 
-                     <TextView
-                        android:id="@+id/history_date_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="28 Juni 2024"
-                        android:textColor="#98989E"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- History Item 2 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="#2C2C2E"
-                app:cardCornerRadius="12dp">
-
-                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:id="@+id/history_icon_2"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_carbs"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/history_title_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ayam Bakar"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginStart="16dp"
-                        app:layout_constraintStart_toEndOf="@id/history_icon_2"
-                        app:layout_constraintTop_toTopOf="@id/history_icon_2" />
-
-                    <TextView
-                        android:id="@+id/history_subtitle_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="350 Kalori"
-                        android:textColor="#EBEBF5"
-                        android:textSize="14sp"
-                        app:layout_constraintStart_toStartOf="@id/history_title_2"
-                        app:layout_constraintTop_toBottomOf="@id/history_title_2" />
-
-                     <TextView
-                        android:id="@+id/history_date_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="27 Juni 2024"
-                        android:textColor="#98989E"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- History Item 3 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="#2C2C2E"
-                app:cardCornerRadius="12dp">
-
-                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:id="@+id/history_icon_3"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_carbs"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
-
-                    <TextView
-                        android:id="@+id/history_title_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Salad Buah"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginStart="16dp"
-                        app:layout_constraintStart_toEndOf="@id/history_icon_3"
-                        app:layout_constraintTop_toTopOf="@id/history_icon_3" />
-
-                    <TextView
-                        android:id="@+id/history_subtitle_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="150 Kalori"
-                        android:textColor="#EBEBF5"
-                        android:textSize="14sp"
-                        app:layout_constraintStart_toStartOf="@id/history_title_3"
-                        app:layout_constraintTop_toBottomOf="@id/history_title_3" />
-
-                     <TextView
-                        android:id="@+id/history_date_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="26 Juni 2024"
-                        android:textColor="#98989E"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

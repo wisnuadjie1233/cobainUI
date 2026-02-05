@@ -1,82 +1,161 @@
 package com.example.cobainui
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import java.util.Calendar
 
 class HomeActivity : AppCompatActivity() {
 
+    // --- DEKLARASI VARIABEL UTAMA ---
     private lateinit var auth: FirebaseAuth
+    private lateinit var greetingText: TextView
     private var backPressedOnce = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        // Pastikan ID 'notification_icon' sesuai dengan yang ada di activity_home.xml kamu
+        val notificationIcon = findViewById<ImageView>(R.id.notification_icon)
+
+        notificationIcon.setOnClickListener {
+            // Intent untuk pindah halaman dari Home ke Notification
+            val intent = Intent(this, NotificationActivity::class.java)
+            startActivity(intent)
+        }
+
+        // --- INISIALISASI & HUBUNGKAN KOMPONEN ---
         auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser
+        // Pastikan ID di activity_home.xml Anda sesuai
+        greetingText = findViewById(R.id.greeting_text)
 
-        val welcomeMessage = findViewById<TextView>(R.id.welcome_message)
-        // Ambil nama pengguna dari Firebase Auth jika tersedia
-        val displayName = currentUser?.displayName ?: "Dewa"
-        welcomeMessage.text = "Selamat Pagi, $displayName!"
+        // Logika Klik Avatar untuk Tamu
+        val userAvatar = findViewById<ImageView>(R.id.user_avatar)
+        userAvatar.setOnClickListener {
+            showGuestProfileSheet()
+        }
 
+        // --- PANGGIL SEMUA FUNGSI SETUP ---
+        setupGreeting()
         setupDateRecyclerView()
         setupCaloriesProgressBar()
-
-        // Handle back press
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (backPressedOnce) {
-                    finishAffinity() // Keluar dari aplikasi
-                    return
-                }
-
-                backPressedOnce = true
-                Toast.makeText(this@HomeActivity, "Tekan lagi untuk keluar", Toast.LENGTH_SHORT).show()
-
-                Handler(Looper.getMainLooper()).postDelayed({
-                    backPressedOnce = false
-                }, 2000) // 2 detik
-            }
-        })
+        setupBackButtonHandler()
+        setupCustomNavigation() // <-- Memanggil fungsi navigasi baru
     }
 
+    private fun showGuestProfileSheet() {
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_guest_profile_sheet, null)
+
+        val btnLoginNow = view.findViewById<MaterialButton>(R.id.btn_login_now)
+        val btnMaybeLater = view.findViewById<TextView>(R.id.btn_maybe_later)
+
+        btnLoginNow.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, Page4Activity::class.java)
+            startActivity(intent)
+        }
+
+        btnMaybeLater.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        resetNavigationToHome()
+    }
+
+    private fun resetNavigationToHome() {
+        val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
+        val navAiIcon = findViewById<ImageView>(R.id.nav_ai_icon)
+        val navScanIcon = findViewById<ImageView>(R.id.nav_scan_icon)
+        val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
+        val navSettingsIcon = findViewById<ImageView>(R.id.nav_settings_icon)
+
+
+        navAiIcon.isSelected = false
+        navScanIcon.isSelected = false
+        navHistoryIcon.isSelected = false
+        navSettingsIcon.isSelected = false
+
+        navHomeIcon.isSelected = true
+    }
+
+    private fun setupGreeting() {
+        val currentUser = auth.currentUser
+        val calendar = Calendar.getInstance()
+        val greeting = when (calendar.get(Calendar.HOUR_OF_DAY)) {
+            in 0..11 -> "Selamat Pagi"
+            in 12..15 -> "Selamat Siang"
+            in 16..18 -> "Selamat Sore"
+            else -> "Selamat Malam"
+        }
+
+        if (currentUser != null) {
+            // Jika user LOGIN
+            val userName = currentUser.displayName ?: "User"
+            greetingText.text = "$greeting $userName"
+        } else {
+            // Jika user TEKAN LEWATI (Tamu)
+            greetingText.text = "$greeting Tamu" // <--- Pastikan cuma ini
+        }
+    }
+
+    // Di dalam HomeActivity.kt
     private fun setupDateRecyclerView() {
         val dateRecyclerView = findViewById<RecyclerView>(R.id.date_recycler_view)
-        dateRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        dateRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         val dates = getWeekDates()
         val adapter = DateAdapter(dates)
         dateRecyclerView.adapter = adapter
 
-        // Set tanggal hari ini sebagai yang dipilih
-        val today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
-        val todayPosition = dates.indexOfFirst { it.date.get(Calendar.DAY_OF_YEAR) == today }
+        // Otomatis tandai dan scroll ke tanggal hari ini
+        val todayCalendar = Calendar.getInstance()
+        val todayPosition = dates.indexOfFirst {
+            it.date.get(Calendar.YEAR) == todayCalendar.get(Calendar.YEAR) &&
+                    it.date.get(Calendar.DAY_OF_YEAR) == todayCalendar.get(Calendar.DAY_OF_YEAR)
+        }
+
         if (todayPosition != -1) {
             dates[todayPosition].isSelected = true
             adapter.notifyItemChanged(todayPosition)
+            // Scroll ke posisi hari ini agar terlihat di layar
             dateRecyclerView.scrollToPosition(todayPosition)
         }
     }
 
+
+    // Di dalam HomeActivity.kt+
     private fun getWeekDates(): List<DateItem> {
         val dates = mutableListOf<DateItem>()
-        val calendar = Calendar.getInstance()
-        calendar.firstDayOfWeek = Calendar.MONDAY
+        val calendar = Calendar.getInstance() // Mulai dari tanggal hari ini
 
-        // Mundur ke hari Senin
+        // Atur kalender ke hari pertama minggu ini (misalnya, Senin)
+        calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
 
+        // Buat daftar 7 hari dari Senin hingga Minggu
         for (i in 0..6) {
             dates.add(DateItem(calendar.clone() as Calendar))
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -86,7 +165,99 @@ class HomeActivity : AppCompatActivity() {
 
     private fun setupCaloriesProgressBar() {
         val caloriesProgressBar = findViewById<CircularProgressBar>(R.id.calories_progress_bar)
-        // Anda bisa mengatur progres dan teks kalori dari data yang sebenarnya
-        caloriesProgressBar.progress = 65f
+        caloriesProgressBar.progressMax = 2000f
+        caloriesProgressBar.progress = 700f
+    }
+
+    private fun setupBackButtonHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (backPressedOnce) {
+                    finishAffinity()
+                    return
+                }
+                backPressedOnce = true
+                showCustomToast("Tekan lagi untuk keluar")
+                Handler(Looper.getMainLooper()).postDelayed({ backPressedOnce = false }, 2000)
+            }
+        })
+    }
+
+    private fun showCustomToast(message: String) {
+        val inflater = LayoutInflater.from(this)
+        val layout = inflater.inflate(R.layout.custom_toast_layout, null)
+        val textView: TextView = layout.findViewById(R.id.toast_text)
+        textView.text = message
+        with(Toast(applicationContext)) {
+            duration = Toast.LENGTH_SHORT
+            view = layout
+            show()
+        }
+    }
+
+    private fun setupCustomNavigation() {
+        // 1. Hubungkan semua ImageView ikon dari layout ke variabel
+        val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
+        val navAiIcon = findViewById<ImageView>(R.id.nav_ai_icon)
+        val navScanIcon = findViewById<ImageView>(R.id.nav_scan_icon)
+        val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
+        val navSettingsIcon = findViewById<ImageView>(R.id.nav_settings_icon)
+
+        // Jadikan semua ikon dalam sebuah list agar mudah dikelola
+        val navIcons = listOf(navHomeIcon, navAiIcon, navScanIcon, navHistoryIcon, navSettingsIcon)
+
+        // Fungsi bantuan untuk menonaktifkan semua ikon
+        fun clearSelection() {
+            navIcons.forEach { it.isSelected = false }
+        }
+
+        // 2. Set item Home sebagai yang aktif saat pertama kali halaman dibuka
+        navHomeIcon.isSelected = true
+
+        // 3. Tambahkan OnClickListener untuk setiap ikon
+        navHomeIcon.setOnClickListener {
+            if (!it.isSelected) { // Hanya jalankan jika belum dipilih
+                clearSelection()
+                it.isSelected = true
+                // TODO: Tampilkan Fragment atau konten untuk Home
+            }
+        }
+
+        navAiIcon.setOnClickListener {
+            if (!it.isSelected) {
+                clearSelection()
+                it.isSelected = true
+                // TODO: Tampilkan Fragment atau konten untuk AI
+            }
+        }
+
+        navScanIcon.setOnClickListener {
+            if (!it.isSelected) {
+                clearSelection()
+                it.isSelected = true
+                // TODO: Tampilkan Fragment atau konten untuk Scan
+            }
+        }
+
+        navHistoryIcon.setOnClickListener {
+            if (!it.isSelected) {
+                clearSelection()
+                it.isSelected = true
+                // TODO: Tampilkan Fragment atau konten untuk History
+            }
+        }
+
+        navSettingsIcon.setOnClickListener {
+            if (!it.isSelected) {
+                clearSelection()
+                it.isSelected = true
+                // PINDAH HALAMAN KE SETTINGS
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                // ANIMASI SLIDE
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+            }
+        }
+
     }
 }

@@ -1,11 +1,13 @@
 package com.example.cobainui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -14,7 +16,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -23,9 +27,11 @@ class Page4Activity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private var backPressedOnce = false
 
-    // Variabel untuk komponen UI
+    private lateinit var skipButton: TextView
     private lateinit var loginTitle: TextView
     private lateinit var emailInput: EditText
+    private lateinit var usernameInput: EditText
+    private lateinit var passwordInputLayout: TextInputLayout
     private lateinit var passwordInput: EditText
     private lateinit var loginButton: Button
     private lateinit var signupPrompt: TextView
@@ -33,22 +39,23 @@ class Page4Activity : AppCompatActivity() {
     private lateinit var forgotPasswordLink: TextView
     private lateinit var googleButton: Button
     private lateinit var emailError: TextView
+    private lateinit var usernameError: TextView
     private lateinit var passwordError: TextView
     private lateinit var generalError: TextView
+    private lateinit var usernameLabel: TextView
 
-    // State untuk melacak apakah kita di mode Login atau Register
     private var isLoginMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page4)
 
-        // Inisialisasi Firebase Auth
         auth = Firebase.auth
 
-        // Hubungkan variabel dengan komponen di layout
         loginTitle = findViewById(R.id.login_title)
         emailInput = findViewById(R.id.email_input)
+        usernameInput = findViewById(R.id.username_input)
+        passwordInputLayout = findViewById(R.id.password_input_layout)
         passwordInput = findViewById(R.id.password_input)
         loginButton = findViewById(R.id.login_button)
         signupPrompt = findViewById(R.id.signup_prompt)
@@ -56,10 +63,12 @@ class Page4Activity : AppCompatActivity() {
         forgotPasswordLink = findViewById(R.id.forgot_password)
         googleButton = findViewById(R.id.google_button)
         emailError = findViewById(R.id.email_error)
+        usernameError = findViewById(R.id.username_error)
         passwordError = findViewById(R.id.password_error)
         generalError = findViewById(R.id.general_error)
+        usernameLabel = findViewById(R.id.username_label)
+        skipButton = findViewById(R.id.skip_button)
 
-        // Set listener untuk tombol utama (yang bisa "Masuk" atau "Daftar")
         loginButton.setOnClickListener {
             if (isLoginMode) {
                 performSignIn()
@@ -68,47 +77,55 @@ class Page4Activity : AppCompatActivity() {
             }
         }
 
-        // Listener untuk menghilangkan error saat user mengetik
         addTextChangeListeners()
 
-        // Set listener untuk link ganti mode (Daftar/Masuk)
         signupLink.setOnClickListener {
             toggleMode()
         }
 
-        // Set listener untuk Lupa Password
         forgotPasswordLink.setOnClickListener {
             val intent = Intent(this, ForgotPasswordActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
-        // Set listener untuk Google Sign-In (untuk nanti)
         googleButton.setOnClickListener {
-            Toast.makeText(this, "Fitur Google Sign-In akan segera hadir!", Toast.LENGTH_SHORT).show()
+            showCustomToast("Fitur Google Sign-In akan segera hadir!")
         }
 
-        // Handle back press
+        skipButton.setOnClickListener {
+            signInAsGuest()
+        }
+
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (backPressedOnce) {
-                    finishAffinity() // Keluar dari aplikasi
+                    finishAffinity()
                     return
                 }
-
                 backPressedOnce = true
-                Toast.makeText(this@Page4Activity, "Tekan lagi untuk keluar", Toast.LENGTH_SHORT).show()
-
-                Handler(Looper.getMainLooper()).postDelayed({
-                    backPressedOnce = false
-                }, 2000) // 2 detik
+                showCustomToast("Tekan lagi untuk keluar")
+                Handler(Looper.getMainLooper()).postDelayed({ backPressedOnce = false }, 2000)
             }
         })
+    }
+
+    private fun showCustomToast(message: String) {
+        val inflater = LayoutInflater.from(this)
+        val layout: View = inflater.inflate(R.layout.custom_toast_layout, null)
+        val textView: TextView = layout.findViewById(R.id.toast_text)
+        textView.text = message
+        with(Toast(applicationContext)) {
+            duration = Toast.LENGTH_SHORT
+            view = layout
+            show()
+        }
     }
 
     private fun validateForm(): Boolean {
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
+        val username = usernameInput.text.toString().trim()
         var isValid = true
 
         if (email.isEmpty()) {
@@ -122,11 +139,18 @@ class Page4Activity : AppCompatActivity() {
 
         if (password.isEmpty()) {
             passwordError.visibility = View.VISIBLE
-            passwordInput.background = ContextCompat.getDrawable(this, R.drawable.bg_dark_edittext_error)
             isValid = false
         } else {
             passwordError.visibility = View.GONE
-            passwordInput.background = ContextCompat.getDrawable(this, R.drawable.bg_dark_edittext)
+        }
+
+        if (!isLoginMode && username.isEmpty()) {
+            usernameError.visibility = View.VISIBLE
+            usernameInput.background = ContextCompat.getDrawable(this, R.drawable.bg_dark_edittext_error)
+            isValid = false
+        } else {
+            usernameError.visibility = View.GONE
+            usernameInput.background = ContextCompat.getDrawable(this, R.drawable.bg_dark_edittext)
         }
 
         return isValid
@@ -137,28 +161,27 @@ class Page4Activity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                generalError.visibility = View.GONE // Sembunyikan error umum
-
-                if (emailInput.hasFocus()) {
-                    if (emailInput.text.isNotEmpty()) {
-                        emailError.visibility = View.GONE
-                        emailInput.background = ContextCompat.getDrawable(this@Page4Activity, R.drawable.bg_dark_edittext)
-                    }
+                generalError.visibility = View.GONE
+                if (emailInput.hasFocus() && emailInput.text.isNotEmpty()) {
+                    emailError.visibility = View.GONE
+                    emailInput.background = ContextCompat.getDrawable(this@Page4Activity, R.drawable.bg_dark_edittext)
                 }
-                if (passwordInput.hasFocus()) {
-                    if (passwordInput.text.isNotEmpty()) {
-                        passwordError.visibility = View.GONE
-                        passwordInput.background = ContextCompat.getDrawable(this@Page4TActivity, R.drawable.bg_dark_edittext)
-                    }
+                if (passwordInput.hasFocus() && passwordInput.text.isNotEmpty()) {
+                    passwordError.visibility = View.GONE
+                }
+                if (usernameInput.hasFocus() && usernameInput.text.isNotEmpty()) {
+                    usernameError.visibility = View.GONE
+                    usernameInput.background = ContextCompat.getDrawable(this@Page4Activity, R.drawable.bg_dark_edittext)
                 }
             }
         }
         emailInput.addTextChangedListener(textWatcher)
         passwordInput.addTextChangedListener(textWatcher)
+        usernameInput.addTextChangedListener(textWatcher)
     }
 
     private fun performSignIn() {
-        generalError.visibility = View.GONE // Selalu sembunyikan sebelum mencoba
+        generalError.visibility = View.GONE
         if (!validateForm()) return
 
         val email = emailInput.text.toString().trim()
@@ -167,12 +190,7 @@ class Page4Activity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "Login Berhasil!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-                    finish()
+                    goToHomeActivity()
                 } else {
                     generalError.visibility = View.VISIBLE
                 }
@@ -180,48 +198,81 @@ class Page4Activity : AppCompatActivity() {
     }
 
     private fun performSignUp() {
-        generalError.visibility = View.GONE // Selalu sembunyikan sebelum mencoba
+        generalError.visibility = View.GONE
         if (!validateForm()) return
 
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
+        val username = usernameInput.text.toString().trim()
 
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "Pendaftaran Berhasil! Silakan Masuk.", Toast.LENGTH_LONG).show()
-                    toggleMode() // Kembali ke mode login
+                    val user = auth.currentUser
+                    val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(username).build()
+                    user?.updateProfile(profileUpdates)?.addOnCompleteListener { updateTask ->
+                        if (updateTask.isSuccessful) {
+                            showCustomToast("Pendaftaran Berhasil! Silakan Masuk.")
+                            toggleMode()
+                        } else {
+                            showCustomToast("Gagal menyimpan nama pengguna: ${updateTask.exception?.message}")
+                        }
+                    }
                 } else {
-                    // Untuk pendaftaran, lebih baik menampilkan pesan error spesifik dari Firebase
-                    Toast.makeText(this, "Pendaftaran Gagal: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    showCustomToast("Pendaftaran Gagal: ${task.exception?.message}")
                 }
             }
     }
 
     private fun toggleMode() {
-        isLoginMode = !isLoginMode // Balik state
+        isLoginMode = !isLoginMode
 
-        // Reset error states
         emailError.visibility = View.GONE
         passwordError.visibility = View.GONE
+        usernameError.visibility = View.GONE
         generalError.visibility = View.GONE
         emailInput.background = ContextCompat.getDrawable(this, R.drawable.bg_dark_edittext)
-        passwordInput.background = ContextCompat.getDrawable(this, R.drawable.bg_dark_edittext)
+        usernameInput.background = ContextCompat.getDrawable(this, R.drawable.bg_dark_edittext)
 
         if (isLoginMode) {
-            // Ubah ke Mode Login
             loginTitle.text = "Selamat Datang Kembali!"
             loginButton.text = "Masuk"
             signupPrompt.text = "Belum punya akun? "
             signupLink.text = "Daftar"
-            forgotPasswordLink.visibility = View.VISIBLE // Munculkan lagi
+            forgotPasswordLink.visibility = View.VISIBLE
+            usernameInput.visibility = View.GONE
+            usernameLabel.visibility = View.GONE
+            usernameError.visibility = View.GONE
         } else {
-            // Ubah ke Mode Registrasi
             loginTitle.text = "Buat Akun Baru"
             loginButton.text = "Daftar"
             signupPrompt.text = "Sudah punya akun? "
             signupLink.text = "Masuk"
-            forgotPasswordLink.visibility = View.GONE // Sembunyikan saat mendaftar
+            forgotPasswordLink.visibility = View.GONE
+            usernameInput.visibility = View.VISIBLE
+            usernameLabel.visibility = View.VISIBLE
         }
+    }
+
+    private fun signInAsGuest() {
+        val sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("skipped_login", true).apply()
+
+        auth.signInAnonymously()
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    goToHomeActivity()
+                } else {
+                    showCustomToast("Gagal masuk sebagai tamu: ${task.exception?.message}")
+                }
+            }
+    }
+
+    private fun goToHomeActivity() {
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        finish()
     }
 }
