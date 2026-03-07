@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1C1C1E"
+    android:fitsSystemWindows="true"
     tools:context=".Page4Activity">
 
     <TextView
@@ -101,7 +102,6 @@
         android:textColor="#EBEBF5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/username_error" />
-
 
     <EditText
         android:id="@+id/email_input"

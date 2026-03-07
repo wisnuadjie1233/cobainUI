@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground"
+    android:fitsSystemWindows="true">
+
+    <!-- Header Section -->
+    <ImageButton
+        android:id="@+id/btn_back_history"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <TextView
+        android:id="@+id/tv_history_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/spacelight"
+        android:text="Riwayat Analisis"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back_history"
+        app:layout_constraintStart_toEndOf="@+id/btn_back_history"
+        app:layout_constraintTop_toTopOf="@+id/btn_back_history" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_history_title">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="32dp">
+
+            <!-- KARTU RINGKASAN MINGGUAN (GRAFIK) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rata-rata Minggu Ini"
+                        android:fontFamily="@font/spacelight"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:alpha="0.7" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/spacelight"
+                        android:text="1,850 kkal"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <!-- Grafik Batang dengan Angka di Atasnya -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="bottom"
+                        android:orientation="horizontal"
+                        android:weightSum="7">
+
+                        <!-- Senin -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.0k"
+                                android:textSize="8sp"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:fontFamily="@font/spacelight"
+                                android:textStyle="bold" />
+
+                            <!-- Wadah Batang + Angka di Dalamnya -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginHorizontal="4dp">
+
+                                <!-- Batang Grafik -->
+                                <ProgressBar
+                                    style="@android:style/Widget.ProgressBar.Horizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:max="2000"
+                                    android:progress="1000"
+                                    android:progressDrawable="@drawable/vertical_bar_tintable"
+                                    android:progressTint="#4A90E2"/>
+
+                                <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="1.8k"
+                                    android:fontFamily="@font/spacelight"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold" /> <!-- Warna Putih agar kontras dengan batang hitam -->
+
+                            </FrameLayout>
+                        </LinearLayout>
+
+                        <!-- Selasa -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.0k"
+                                android:textSize="8sp"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:fontFamily="@font/spacelight"
+                                android:textStyle="bold"/>
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginHorizontal="4dp">
+
+                                <ProgressBar
+                                    style="@android:style/Widget.ProgressBar.Horizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:max="2000"
+                                    android:progress="1800"
+                                    android:progressDrawable="@drawable/vertical_bar_tintable"
+                                    android:progressTint="#2EC4B6"/>
+
+                                <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="1.8k"
+                                    android:fontFamily="@font/spacelight"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold" />
+                            </FrameLayout>
+                        </LinearLayout>
+
+                        <!-- Rabu -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.0k"
+                                android:textSize="8sp"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:fontFamily="@font/spacelight"
+                                android:textStyle="bold" />
+
+                            <!-- Wadah Batang + Angka di Dalamnya -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginHorizontal="4dp">
+
+                                <!-- Batang Grafik -->
+                                <ProgressBar
+                                    style="@android:style/Widget.ProgressBar.Horizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:max="2000"
+                                    android:progress="1800"
+                                    android:progressDrawable="@drawable/vertical_bar_tintable"
+                                    android:progressTint="#6BCB77"/>
+
+                                <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="1.8k"
+                                    android:fontFamily="@font/spacelight"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold" /> <!-- Warna Putih agar kontras dengan batang hitam -->
+
+                            </FrameLayout>
+                        </LinearLayout>
+
+                        <!-- Kamis -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.0k"
+                                android:textSize="8sp"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:fontFamily="@font/spacelight"
+                                android:textStyle="bold" />
+
+                            <!-- Wadah Batang + Angka di Dalamnya -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginHorizontal="4dp">
+
+                                <!-- Batang Grafik -->
+                                <ProgressBar
+                                    style="@android:style/Widget.ProgressBar.Horizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:max="2000"
+                                    android:progress="1800"
+                                    android:progressDrawable="@drawable/vertical_bar_tintable"
+                                    android:progressTint="#FFD166"/>
+
+                                <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="1.8k"
+                                    android:fontFamily="@font/spacelight"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold" /> <!-- Warna Putih agar kontras dengan batang hitam -->
+
+                            </FrameLayout>
+                        </LinearLayout>
+
+
+                        <!-- Jumat -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.0k"
+                                android:textSize="8sp"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:fontFamily="@font/spacelight"
+                                android:textStyle="bold" />
+
+                            <!-- Wadah Batang + Angka di Dalamnya -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginHorizontal="4dp">
+
+                                <!-- Batang Grafik -->
+                                <ProgressBar
+                                    style="@android:style/Widget.ProgressBar.Horizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:max="2000"
+                                    android:progress="1800"
+                                    android:progressDrawable="@drawable/vertical_bar_tintable"
+                                    android:progressTint="#F77F00"/>
+
+                                <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="1.8k"
+                                    android:fontFamily="@font/spacelight"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold" /> <!-- Warna Putih agar kontras dengan batang hitam -->
+
+                            </FrameLayout>
+                        </LinearLayout>
+
+
+                        <!-- Sabtu -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.0k"
+                                android:textSize="8sp"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:fontFamily="@font/spacelight"
+                                android:textStyle="bold" />
+
+                            <!-- Wadah Batang + Angka di Dalamnya -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginHorizontal="4dp">
+
+                                <!-- Batang Grafik -->
+                                <ProgressBar
+                                    style="@android:style/Widget.ProgressBar.Horizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:max="2000"
+                                    android:progress="1800"
+                                    android:progressDrawable="@drawable/vertical_bar_tintable"
+                                    android:progressTint="#FF6B9A"/>
+
+                                <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="1.8k"
+                                    android:fontFamily="@font/spacelight"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold" /> <!-- Warna Putih agar kontras dengan batang hitam -->
+
+                            </FrameLayout>
+                        </LinearLayout>
+
+
+                        <!-- Minggu -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal">
+
+                            <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.0k"
+                                android:textSize="8sp"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:fontFamily="@font/spacelight"
+                                android:textStyle="bold" />
+
+                            <!-- Wadah Batang + Angka di Dalamnya -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginHorizontal="4dp">
+
+                                <!-- Batang Grafik -->
+                                <ProgressBar
+                                    style="@android:style/Widget.ProgressBar.Horizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:max="2000"
+                                    android:progress="1800"
+                                    android:progressDrawable="@drawable/vertical_bar_tintable"
+                                    android:progressTint="#9B5DE5"/>
+
+                                <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="1.8k"
+                                    android:fontFamily="@font/spacelight"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold" /> <!-- Warna Putih agar kontras dengan batang hitam -->
+
+                            </FrameLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Label Hari (Nama Penuh) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:weightSum="7">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Senin" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Selasa" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Rabu" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Kamis" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Jumat" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sabtu" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Minggu" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- SEKSI MAKRONTURISI -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:columnCount="2">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Protein" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/spacelight" android:text="65g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Karbo" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/spacelight" android:layout_marginTop="4dp" android:text="140g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gula"
+                            android:fontFamily="@font/spacelight"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="25g avg"
+                            android:fontFamily="@font/spacelight"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Lemak"
+                            android:fontFamily="@font/spacelight"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="12sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="50g avg"
+                            android:fontFamily="@font/spacelight"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </GridLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:text="Catatan Harian"
+                android:fontFamily="@font/spacelight"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="14sp" />
+
+            <!-- Area untuk List Riwayat -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_history_logs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="3"
+                tools:listitem="@layout/date_item_layout" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

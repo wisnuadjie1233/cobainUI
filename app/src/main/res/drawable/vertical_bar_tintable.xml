@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">    <!-- 1. Layer Background (Wadah) -->
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="12dp" />
+            <solid android:color="#AEA9B2" /> <!-- Warna netral/abu-abu -->
+        </shape>
+    </item>
+
+    <!-- 2. Layer Progress (Isi) -->
+    <item android:id="@android:id/progress">
+        <scale android:scaleGravity="bottom" android:scaleHeight="100%">
+            <shape>
+                <corners android:radius="12dp" />
+                <solid android:color="#000000" /> <!-- Warna netral/hitam -->
+            </shape>
+        </scale>
+    </item>
+</layer-list>

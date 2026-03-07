@@ -45,7 +45,10 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             menuProfile.setOnClickListener {
-                // Ke halaman edit profil jika sudah login
+                val intent = Intent(this, EditProfileActivity::class.java)
+                startActivity(intent)
+                // Animasi geser ke kiri (masuk)
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             }
         }
 

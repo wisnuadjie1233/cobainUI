@@ -108,6 +108,20 @@ class Page4Activity : AppCompatActivity() {
                 Handler(Looper.getMainLooper()).postDelayed({ backPressedOnce = false }, 2000)
             }
         })
+
+        // --- LOGIKA MEMBACA LOGIN TERAKHIR ---
+        val sharedPref = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+        val savedEmail = sharedPref.getString("last_email", "")
+        val savedPassword = sharedPref.getString("last_password", "")
+
+        if (!savedEmail.isNullOrEmpty()) {
+            emailInput.setText(savedEmail)
+        }
+        if (!savedPassword.isNullOrEmpty()) {
+            passwordInput.setText(savedPassword)
+        }
+        // -------------------------------------
+
     }
 
     private fun showCustomToast(message: String) {
@@ -190,7 +204,23 @@ class Page4Activity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    goToHomeActivity()
+                    val user = auth.currentUser
+
+                    if (user != null && user.isEmailVerified) {
+
+                        // === TAMBAHKAN LOGIKA SIMPAN DI SINI ===
+                        val sharedPref = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+                        val editor = sharedPref.edit()
+                        editor.putString("last_email", email)
+                        editor.putString("last_password", password)
+                        editor.apply()
+                        // ======================================
+
+                        goToHomeActivity()
+                    } else {
+                        showCustomToast("Email belum diverifikasi. Cek inbox kamu!")
+                        auth.signOut()
+                    }
                 } else {
                     generalError.visibility = View.VISIBLE
                 }
@@ -209,13 +239,22 @@ class Page4Activity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(username).build()
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(username)
+                        .build()
+
                     user?.updateProfile(profileUpdates)?.addOnCompleteListener { updateTask ->
                         if (updateTask.isSuccessful) {
-                            showCustomToast("Pendaftaran Berhasil! Silakan Masuk.")
-                            toggleMode()
-                        } else {
-                            showCustomToast("Gagal menyimpan nama pengguna: ${updateTask.exception?.message}")
+                            // KIRIM LINK VERIFIKASI KE EMAIL
+                            user.sendEmailVerification().addOnCompleteListener { verifyTask ->
+                                if (verifyTask.isSuccessful) {
+                                    showCustomToast("Daftar Berhasil! Cek email untuk verifikasi.")
+                                    auth.signOut() // Logout paksa supaya dia tidak langsung masuk
+                                    if (!isLoginMode) toggleMode() // Balikkan ke tampilan 'Masuk'
+                                } else {
+                                    showCustomToast("Gagal mengirim email verifikasi.")
+                                }
+                            }
                         }
                     }
                 } else {
