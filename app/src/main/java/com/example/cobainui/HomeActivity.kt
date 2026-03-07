@@ -82,6 +82,12 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         resetNavigationToHome()
+
+        val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
+        val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
+
+        navHistoryIcon.isSelected = false
+        navHomeIcon.isSelected = true
     }
 
     private fun resetNavigationToHome() {
@@ -203,6 +209,7 @@ class HomeActivity : AppCompatActivity() {
         val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
         val navSettingsIcon = findViewById<ImageView>(R.id.nav_settings_icon)
 
+
         // Jadikan semua ikon dalam sebuah list agar mudah dikelola
         val navIcons = listOf(navHomeIcon, navAiIcon, navScanIcon, navHistoryIcon, navSettingsIcon)
 
@@ -236,6 +243,11 @@ class HomeActivity : AppCompatActivity() {
                 clearSelection()
                 it.isSelected = true
                 // TODO: Tampilkan Fragment atau konten untuk Scan
+                val intent = Intent(this, AnalysisHistoryActivity::class.java)
+                startActivity(intent)
+
+                // Beri animasi geser samping agar konsisten dengan Settings
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             }
         }
 
@@ -244,6 +256,11 @@ class HomeActivity : AppCompatActivity() {
                 clearSelection()
                 it.isSelected = true
                 // TODO: Tampilkan Fragment atau konten untuk History
+                val intent = Intent(this, EducationActivity::class.java)
+                startActivity(intent)
+
+                // Beri animasi swipe biar konsisten dengan menu lainnya
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             }
         }
 

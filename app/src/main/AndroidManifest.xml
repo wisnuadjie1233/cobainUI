@@ -39,6 +39,10 @@
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".AnalysisHistoryActivity"
+            android:exported="false"/>
+        <activity android:name=".EducationActivity" android:exported="false"/>
+        <activity
             android:name=".ResetPasswordActivity"
             android:exported="true">
             <intent-filter>
@@ -51,7 +55,5 @@
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-
     </application>
-
 </manifest>
