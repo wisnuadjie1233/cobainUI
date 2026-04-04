@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-feature android:name="android.hardware.camera" android:required="true"/>
 
     <application
         android:allowBackup="true"
@@ -41,13 +39,6 @@
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".AnalysisHistoryActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".EditProfileActivity"
-            android:exported="false" />
-        <activity android:name=".EducationActivity" android:exported="false"/>
-        <activity
             android:name=".ResetPasswordActivity"
             android:exported="true">
             <intent-filter>
@@ -60,5 +51,7 @@
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
+
     </application>
+
 </manifest>
