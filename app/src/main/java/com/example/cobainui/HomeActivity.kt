@@ -1,5 +1,8 @@
 package com.example.cobainui
 
+import android.view.View
+import android.provider.MediaStore
+import android.graphics.Bitmap
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -9,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +28,23 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var greetingText: TextView
     private var backPressedOnce = false
+
+    // Peluncur Izin Kamera
+    private val requestCameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) openCamera() else Toast.makeText(this, "Izin kamera ditolak", Toast.LENGTH_SHORT).show()
+    }
+
+    // Peluncur Tangkap Hasil Foto
+    private val takePictureLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val bitmap = result.data?.extras?.get("data") as? android.graphics.Bitmap
+            bitmap?.let { showScanningResultSheet(it) }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -46,8 +67,19 @@ class HomeActivity : AppCompatActivity() {
 
         // Logika Klik Avatar untuk Tamu
         val userAvatar = findViewById<ImageView>(R.id.user_avatar)
+
         userAvatar.setOnClickListener {
-            showGuestProfileSheet()
+            val currentUser = FirebaseAuth.getInstance().currentUser
+
+            // Cek: Jika user NULL atau dia login secara Anonim (Tamu)
+            if (currentUser == null || currentUser.isAnonymous) {
+                showGuestProfileSheet() // Munculkan popup login yang lama
+            } else {
+                // JIKA SUDAH LOGIN: Langsung ke Edit Profil
+                val intent = Intent(this, EditProfileActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+            }
         }
 
         // --- PANGGIL SEMUA FUNGSI SETUP ---
@@ -81,7 +113,26 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        resetNavigationToHome()
+
+        // 1. Refresh data user agar nama update
+        setupGreeting()
+        setupCaloriesProgressBar()
+
+        // 2. RESET TOTAL STATUS NAVIGASI (Solusi Masalahmu)
+        val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
+        val navAiIcon = findViewById<ImageView>(R.id.nav_ai_icon)
+        val navScanIcon = findViewById<ImageView>(R.id.nav_scan_icon) // Ikon nomor 3
+        val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
+        val navSettingsIcon = findViewById<ImageView>(R.id.nav_settings_icon)
+
+        // Paksa semua false dulu
+        navAiIcon.isSelected = false
+        navScanIcon.isSelected = false
+        navHistoryIcon.isSelected = false
+        navSettingsIcon.isSelected = false
+
+        // Paksa Home true
+        navHomeIcon.isSelected = true
     }
 
     private fun resetNavigationToHome() {
@@ -165,8 +216,31 @@ class HomeActivity : AppCompatActivity() {
 
     private fun setupCaloriesProgressBar() {
         val caloriesProgressBar = findViewById<CircularProgressBar>(R.id.calories_progress_bar)
-        caloriesProgressBar.progressMax = 2000f
-        caloriesProgressBar.progress = 700f
+        val tvCaloriesValue = findViewById<TextView>(R.id.calories_text)
+
+        val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
+        val consumed = sharedPref.getFloat("consumed_calories", 0f)
+
+        // 1. Tentukan batas maksimal visual (Batas Macet)
+        val batasMacet = 2000f
+        val targetFull = 4000f // Kapasitas wadah grafik
+
+        // 2. Atur wadah grafik
+        caloriesProgressBar.progressMax = targetFull
+
+        // 3. LOGIKA BIAR STUCK:
+        // Jika kalori yang dimakan sudah mencapai atau melewati 500
+        if (consumed >= batasMacet) {
+            // PAKSA bar berhenti di angka 500 (diem/stuck)
+            caloriesProgressBar.progress = batasMacet
+        } else {
+            // Jika masih di bawah 500, gerakkan bar secara normal
+            caloriesProgressBar.progress = consumed
+        }
+
+        // 4. UPDATE TEKS (Teks tidak ikut stuck, tetap angka asli)
+        // Jadi kalau sudah scan lagi dan jadi 600, teks tulis 600, tapi bar tetap di posisi 500
+        tvCaloriesValue.text = consumed.toInt().toString()
     }
 
     private fun setupBackButtonHandler() {
@@ -223,27 +297,35 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+
         navAiIcon.setOnClickListener {
-            if (!it.isSelected) {
-                clearSelection()
-                it.isSelected = true
-                // TODO: Tampilkan Fragment atau konten untuk AI
-            }
+                // Kita tidak perlu seleksi oranye untuk kamera, langsung buka saja
+                requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
         }
 
         navScanIcon.setOnClickListener {
-            if (!it.isSelected) {
-                clearSelection()
-                it.isSelected = true
-                // TODO: Tampilkan Fragment atau konten untuk Scan
-            }
+            // Hapus pengecekan 'if (!it.isSelected)' khusus untuk navigasi antar halaman
+            // Agar setiap kali ditekan, dia PASTI pindah tanpa peduli status sebelumnya.
+
+            val intent = Intent(this, AnalysisHistoryActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         }
 
         navHistoryIcon.setOnClickListener {
             if (!it.isSelected) {
-                clearSelection()
+                // 1. Bersihkan seleksi ikon lain
+                navIcons.forEach { icon -> icon.isSelected = false }
+
+                // 2. Tandai ikon ini sebagai terpilih (nyala oranye)
                 it.isSelected = true
-                // TODO: Tampilkan Fragment atau konten untuk History
+
+                // 3. PINDAH KE HALAMAN EDUKASI
+                val intent = Intent(this, EducationActivity::class.java)
+                startActivity(intent)
+
+                // 4. ANIMASI SLIDE
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             }
         }
 
@@ -259,5 +341,43 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun openCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        takePictureLauncher.launch(intent)
+    }private fun showScanningResultSheet(bitmap: android.graphics.Bitmap) {
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_scanning_result, null)
+        val ivPreview = view.findViewById<ImageView>(R.id.iv_scan_preview)
+        val tvStatus = view.findViewById<TextView>(R.id.tv_scan_status)
+        val btnAdd = view.findViewById<MaterialButton>(R.id.btn_add_to_log)
+
+        ivPreview.setImageBitmap(bitmap)
+
+        // Gimmick AI 2 detik
+        Handler(Looper.getMainLooper()).postDelayed({
+            val cal = 250f
+            tvStatus.text = "Terdeteksi: Dada Ayam Bakar\nEstimasi: ${cal.toInt()} kkal"
+            btnAdd.visibility = View.VISIBLE
+
+            btnAdd.setOnClickListener {
+                val pref = getSharedPreferences("UserStats", MODE_PRIVATE)
+                val currentTotal = pref.getFloat("consumed_calories", 0f)
+                val total = currentTotal + cal // cal adalah 250f
+
+                // Simpan total baru
+                pref.edit().putFloat("consumed_calories", total).apply()
+
+                // Panggil fungsi di atas untuk update tampilan (angka & bar)
+                setupCaloriesProgressBar()
+
+                dialog.dismiss()
+                Toast.makeText(this, "Berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
+            }
+        }, 2000)
+
+        dialog.setContentView(view)
+        dialog.show()
     }
 }
