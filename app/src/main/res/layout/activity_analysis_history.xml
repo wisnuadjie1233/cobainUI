@@ -18,8 +18,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?android:attr/textColorPrimary" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_history_title"

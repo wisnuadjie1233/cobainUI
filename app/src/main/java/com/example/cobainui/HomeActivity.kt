@@ -238,6 +238,17 @@ class HomeActivity : AppCompatActivity() {
             caloriesProgressBar.progress = consumed
         }
 
+        val color = when {
+            consumed <= 2000 -> android.graphics.Color.BLACK // Normal (Hitam)
+            consumed <= 2300 -> android.graphics.Color.parseColor("#FBC02D") // Over dikit (Kuning)
+            consumed <= 2600 -> android.graphics.Color.parseColor("#F57C00") // Over sedang (Oren)
+            else -> android.graphics.Color.parseColor("#D32F2F") // Bahaya (Merah)
+        }
+
+        // Set warna bar-nya
+        caloriesProgressBar.progressBarColor = color
+
+
         // 4. UPDATE TEKS (Teks tidak ikut stuck, tetap angka asli)
         // Jadi kalau sudah scan lagi dan jadi 600, teks tulis 600, tapi bar tetap di posisi 500
         tvCaloriesValue.text = consumed.toInt().toString()

@@ -131,7 +131,24 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- 1. BAR BAWAH (WADAH SETENGAH LINGKARAN) -->
+                <!-- 1. BAR PALING BAWAH (BORDER LUAR HITAM TEGAS) -->
+                <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                    android:id="@+id/calories_border_outer"
+                    android:layout_width="203dp"
+                    android:layout_height="205dp"
+                    app:cpb_background_progressbar_color="@android:color/transparent"
+                    app:cpb_progress="50"
+                    app:cpb_progress_max="100"
+                    app:cpb_progressbar_color="#000000"
+                    app:cpb_progressbar_width="19dp"
+                    app:cpb_round_border="true"
+                    app:cpb_start_angle="270"
+                    app:layout_constraintBottom_toBottomOf="@id/calories_background_bar"
+                    app:layout_constraintEnd_toEndOf="@id/calories_background_bar"
+                    app:layout_constraintStart_toStartOf="@id/calories_background_bar"
+                    app:layout_constraintTop_toTopOf="@id/calories_background_bar" />
+
+                <!-- 2. BAR TENGAH (WADAH UNGU MUDA - Yang sudah kamu punya) -->
                 <com.mikhaellopez.circularprogressbar.CircularProgressBar
                     android:id="@+id/calories_background_bar"
                     android:layout_width="200dp"
@@ -141,14 +158,14 @@
                     app:cpb_progress="50"
                     app:cpb_progress_max="100"
                     app:cpb_progressbar_color="#E1CDEE"
-                    app:cpb_progressbar_width="20dp"
+                    app:cpb_progressbar_width="16dp"
                     app:cpb_round_border="true"
                     app:cpb_start_angle="270"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/total_kalori_label" />
 
-                <!-- 2. BAR ATAS (INDIKATOR HITAM) -->
+                <!-- 3. BAR ATAS (PROGRESS INDIKATOR - Yang berubah warna) -->
                 <com.mikhaellopez.circularprogressbar.CircularProgressBar
                     android:id="@+id/calories_progress_bar"
                     android:layout_width="200dp"
@@ -157,14 +174,13 @@
                     app:cpb_progress="30"
                     app:cpb_progress_max="100"
                     app:cpb_progressbar_color="#000000"
-                    app:cpb_progressbar_width="20dp"
+                    app:cpb_progressbar_width="16dp"
                     app:cpb_round_border="true"
                     app:cpb_start_angle="270"
                     app:layout_constraintBottom_toBottomOf="@id/calories_background_bar"
                     app:layout_constraintEnd_toEndOf="@id/calories_background_bar"
                     app:layout_constraintStart_toStartOf="@id/calories_background_bar"
                     app:layout_constraintTop_toTopOf="@id/calories_background_bar" />
-
                 <View
                     android:id="@+id/calories_text_background"
                     android:layout_width="150dp"
