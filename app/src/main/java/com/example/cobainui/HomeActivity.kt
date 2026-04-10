@@ -1,5 +1,6 @@
 package com.example.cobainui
 
+import android.widget.ProgressBar
 import android.view.View
 import android.provider.MediaStore
 import android.graphics.Bitmap
@@ -86,6 +87,7 @@ class HomeActivity : AppCompatActivity() {
         setupGreeting()
         setupDateRecyclerView()
         setupCaloriesProgressBar()
+        setupNutrientsProgressBar()
         setupBackButtonHandler()
         setupCustomNavigation() // <-- Memanggil fungsi navigasi baru
     }
@@ -117,6 +119,7 @@ class HomeActivity : AppCompatActivity() {
         // 1. Refresh data user agar nama update
         setupGreeting()
         setupCaloriesProgressBar()
+        setupNutrientsProgressBar()
 
         // 2. RESET TOTAL STATUS NAVIGASI (Solusi Masalahmu)
         val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
@@ -254,6 +257,33 @@ class HomeActivity : AppCompatActivity() {
         tvCaloriesValue.text = consumed.toInt().toString()
     }
 
+    private fun setupNutrientsProgressBar() {
+        // Hubungkan komponen dari XML
+        val carbsProgress = findViewById<ProgressBar>(R.id.carbs_progress)
+        val tvCarbsValue = findViewById<TextView>(R.id.carbs_value)
+        val proteinProgress = findViewById<ProgressBar>(R.id.protein_progress)
+        val tvProteinValue = findViewById<TextView>(R.id.protein_value)
+
+        val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
+
+        // Ambil data nutrisi
+        val consumedCarbs = sharedPref.getFloat("consumed_carbs", 0f)
+        val consumedProtein = sharedPref.getFloat("consumed_protein", 0f)
+
+        // --- LOGIKA KARBOHIDRAT (Target 300g) ---
+        val targetCarbs = 300
+        carbsProgress.max = targetCarbs
+        // Gunakan logika 'stuck' agar tidak meluber
+        carbsProgress.progress = if (consumedCarbs > targetCarbs) targetCarbs else consumedCarbs.toInt()
+        tvCarbsValue.text = "${consumedCarbs.toInt()}g"
+
+        // --- LOGIKA PROTEIN (Target 100g) ---
+        val targetProtein = 100
+        proteinProgress.max = targetProtein
+        proteinProgress.progress = if (consumedProtein > targetProtein) targetProtein else consumedProtein.toInt()
+        tvProteinValue.text = "${consumedProtein.toInt()}g"
+    }
+
     private fun setupBackButtonHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -367,27 +397,35 @@ class HomeActivity : AppCompatActivity() {
         ivPreview.setImageBitmap(bitmap)
 
         // Gimmick AI 2 detik
+        // Gimmick AI 2 detik
         Handler(Looper.getMainLooper()).postDelayed({
             val cal = 250f
-            tvStatus.text = "Terdeteksi: Dada Ayam Bakar\nEstimasi: ${cal.toInt()} kkal"
+            val addCarbs = 30f   // Data dummy karbo
+            val addProtein = 25f // Data dummy protein
+
+            // UPDATE BAGIAN INI: Menampilkan ketiga nutrisi di teks preview
+            tvStatus.text = "Terdeteksi: Dada Ayam Bakar\nEstimasi: ${cal.toInt()} kkal\nCarb: ${addCarbs.toInt()}g | Prot: ${addProtein.toInt()}g"
+
             btnAdd.visibility = View.VISIBLE
 
             btnAdd.setOnClickListener {
                 val pref = getSharedPreferences("UserStats", MODE_PRIVATE)
-                val currentTotal = pref.getFloat("consumed_calories", 0f)
-                val total = currentTotal + cal // cal adalah 250f
+                val editor = pref.edit()
 
-                // Simpan total baru
-                pref.edit().putFloat("consumed_calories", total).apply()
+                // Simpan akumulasi ke memori
+                editor.putFloat("consumed_calories", pref.getFloat("consumed_calories", 0f) + cal)
+                editor.putFloat("consumed_carbs", pref.getFloat("consumed_carbs", 0f) + addCarbs)
+                editor.putFloat("consumed_protein", pref.getFloat("consumed_protein", 0f) + addProtein)
+                editor.apply()
 
-                // Panggil fungsi di atas untuk update tampilan (angka & bar)
+                // Update semua tampilan di Home
                 setupCaloriesProgressBar()
+                setupNutrientsProgressBar()
 
                 dialog.dismiss()
-                Toast.makeText(this, "Berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
+                showCustomToast("Nutrisi berhasil ditambahkan!")
             }
         }, 2000)
-
         dialog.setContentView(view)
         dialog.show()
     }
