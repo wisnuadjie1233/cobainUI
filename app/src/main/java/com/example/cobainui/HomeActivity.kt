@@ -90,6 +90,7 @@ class HomeActivity : AppCompatActivity() {
         setupNutrientsProgressBar()
         setupBackButtonHandler()
         setupCustomNavigation() // <-- Memanggil fungsi navigasi baru
+        checkAndResetDailyData() // <-- Memanggil fungsi reset data harian
     }
 
     private fun showGuestProfileSheet() {
@@ -382,6 +383,42 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun checkAndResetDailyData() {
+        val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
+        val lastDate = sharedPref.getString("last_opened_date", "")
+
+        val calendar = Calendar.getInstance()
+        val currentDate = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
+
+        if (lastDate != "" && lastDate != currentDate) {
+            // --- SEBELUM DIRESET, KITA SIMPAN DATA KEMARIN KE GUDANG ---
+            val editor = sharedPref.edit()
+
+            val caloriesKemarin = sharedPref.getFloat("consumed_calories", 0f)
+            val carbsKemarin = sharedPref.getFloat("consumed_carbs", 0f)
+            val proteinKemarin = sharedPref.getFloat("consumed_protein", 0f)
+
+            // Simpan ke key khusus tanggal (misal: "calories_2026-04-06")
+            editor.putFloat("calories_$lastDate", caloriesKemarin)
+            editor.putFloat("carbs_$lastDate", carbsKemarin)
+            editor.putFloat("protein_$lastDate", proteinKemarin)
+
+            // --- BARU SETELAH ITU RESET HOME JADI 0 ---
+            editor.putFloat("consumed_calories", 0f)
+            editor.putFloat("consumed_carbs", 0f)
+            editor.putFloat("consumed_protein", 0f)
+
+            editor.putString("last_opened_date", currentDate)
+            editor.apply()
+
+            setupCaloriesProgressBar()
+            setupNutrientsProgressBar()
+        } else if (lastDate == "") {
+            // Jika baru pertama kali instal
+            sharedPref.edit().putString("last_opened_date", currentDate).apply()
+        }
     }
 
     private fun openCamera() {

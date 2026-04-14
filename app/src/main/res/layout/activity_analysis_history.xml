@@ -75,6 +75,7 @@
                         android:alpha="0.7" />
 
                     <TextView
+                        android:id="@+id/tv_average_total"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/spacelight"
@@ -118,6 +119,7 @@
 
                                 <!-- Batang Grafik -->
                                 <ProgressBar
+                                    android:id="@+id/bar_senin"
                                     style="@android:style/Widget.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -128,6 +130,7 @@
 
                                 <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
                                 <TextView
+                                    android:id="@+id/tv_val_senin"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -163,6 +166,7 @@
                                 android:layout_marginHorizontal="4dp">
 
                                 <ProgressBar
+                                    android:id="@+id/bar_selasa"
                                     style="@android:style/Widget.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -173,6 +177,7 @@
 
                                 <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
                                 <TextView
+                                    android:id="@+id/tv_val_selasa"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -210,6 +215,7 @@
 
                                 <!-- Batang Grafik -->
                                 <ProgressBar
+                                    android:id="@+id/bar_rabu"
                                     style="@android:style/Widget.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -220,6 +226,7 @@
 
                                 <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
                                 <TextView
+                                    android:id="@+id/tv_val_rabu"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -258,6 +265,7 @@
 
                                 <!-- Batang Grafik -->
                                 <ProgressBar
+                                    android:id="@+id/bar_kamis"
                                     style="@android:style/Widget.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -268,6 +276,7 @@
 
                                 <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
                                 <TextView
+                                    android:id="@+id/tv_val_kamis"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -307,6 +316,7 @@
 
                                 <!-- Batang Grafik -->
                                 <ProgressBar
+                                    android:id="@+id/bar_jumat"
                                     style="@android:style/Widget.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -317,6 +327,7 @@
 
                                 <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
                                 <TextView
+                                    android:id="@+id/tv_val_jumat"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -356,6 +367,7 @@
 
                                 <!-- Batang Grafik -->
                                 <ProgressBar
+                                    android:id="@+id/bar_sabtu"
                                     style="@android:style/Widget.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -366,6 +378,7 @@
 
                                 <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
                                 <TextView
+                                    android:id="@+id/tv_val_sabtu"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -405,6 +418,7 @@
 
                                 <!-- Batang Grafik -->
                                 <ProgressBar
+                                    android:id="@+id/bar_minggu"
                                     style="@android:style/Widget.ProgressBar.Horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -415,6 +429,7 @@
 
                                 <!-- INFO 2: REALISASI (Berada di tengah-tengah batang) -->
                                 <TextView
+                                    android:id="@+id/tv_val_minggu"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -468,7 +483,7 @@
                         android:orientation="vertical"
                         android:padding="16dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Protein" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/spacelight" android:text="65g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
+                        <TextView android:id="@+id/tv_protein_avg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/spacelight" android:text="65g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -486,7 +501,7 @@
                         android:orientation="vertical"
                         android:padding="16dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Karbo" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/spacelight" android:layout_marginTop="4dp" android:text="140g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
+                        <TextView android:id="@+id/tv_carbs_avg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/spacelight" android:layout_marginTop="4dp" android:text="140g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -512,6 +527,7 @@
                             android:textColor="?android:attr/textColorSecondary"
                             android:textSize="12sp"/>
                         <TextView
+                            android:id="@+id/tv_sugar_avg"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -544,6 +560,7 @@
                             android:textColor="?android:attr/textColorSecondary"
                             android:textSize="12sp" />
                         <TextView
+                            android:id="@+id/tv_fat_avg"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
