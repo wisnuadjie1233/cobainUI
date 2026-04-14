@@ -583,13 +583,16 @@
                 android:textSize="14sp" />
 
             <!-- Area untuk List Riwayat -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_history_logs"
+            <!-- Ganti RecyclerView tadi dengan ini -->
+            <TextView
+                android:id="@+id/tv_food_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                tools:itemCount="3"
-                tools:listitem="@layout/date_item_layout" />
+                android:padding="16dp"
+                android:text="Belum ada catatan makan hari ini."
+                android:fontFamily="@font/spacelight"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="14sp" />
 
         </LinearLayout>
     </ScrollView>

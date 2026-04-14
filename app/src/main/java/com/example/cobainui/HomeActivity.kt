@@ -409,8 +409,11 @@ class HomeActivity : AppCompatActivity() {
             editor.putFloat("consumed_calories", 0f)
             editor.putFloat("consumed_carbs", 0f)
             editor.putFloat("consumed_protein", 0f)
+            editor.putFloat("consumed_sugar", 0f) // Reset Gula
+            editor.putFloat("consumed_fat", 0f)   // Reset Lemak
 
             editor.putString("last_opened_date", currentDate)
+            editor.putString("daily_food_history", "") // Reset list jadi kosong
             editor.apply()
 
             setupCaloriesProgressBar()
@@ -424,7 +427,9 @@ class HomeActivity : AppCompatActivity() {
     private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         takePictureLauncher.launch(intent)
-    }private fun showScanningResultSheet(bitmap: android.graphics.Bitmap) {
+    }
+
+    private fun showScanningResultSheet(bitmap: android.graphics.Bitmap) {
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.layout_scanning_result, null)
         val ivPreview = view.findViewById<ImageView>(R.id.iv_scan_preview)
@@ -433,15 +438,18 @@ class HomeActivity : AppCompatActivity() {
 
         ivPreview.setImageBitmap(bitmap)
 
-        // Gimmick AI 2 detik
-        // Gimmick AI 2 detik
         Handler(Looper.getMainLooper()).postDelayed({
             val cal = 250f
-            val addCarbs = 30f   // Data dummy karbo
-            val addProtein = 25f // Data dummy protein
+            val addCarbs = 30f
+            val addProt = 25f
+            val addSugar = 5f
+            val addFat = 12f
 
-            // UPDATE BAGIAN INI: Menampilkan ketiga nutrisi di teks preview
-            tvStatus.text = "Terdeteksi: Dada Ayam Bakar\nEstimasi: ${cal.toInt()} kkal\nCarb: ${addCarbs.toInt()}g | Prot: ${addProtein.toInt()}g"
+            // --- 1. UPDATE TEKS PREVIEW (PASTIKAN MUNCUL 4 BARIS) ---
+            tvStatus.text = "Terdeteksi: Dada Ayam Bakar\n" +
+                    "Estimasi: ${cal.toInt()} kkal\n" +
+                    "Carbs: ${addCarbs.toInt()}g | Prot: ${addProt.toInt()}g\n" +
+                    "Sugar: ${addSugar.toInt()}g | Fat: ${addFat.toInt()}g"
 
             btnAdd.visibility = View.VISIBLE
 
@@ -449,18 +457,30 @@ class HomeActivity : AppCompatActivity() {
                 val pref = getSharedPreferences("UserStats", MODE_PRIVATE)
                 val editor = pref.edit()
 
-                // Simpan akumulasi ke memori
+                val sdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                val currentTime = sdf.format(java.util.Date())
+
+                // --- 2. UPDATE CATATAN HARIAN AGAR LENGKAP (5 NUTRISI) ---
+                // Format: Nama|Jam|Kalori|Carbs|Prot|Sugar|Fat
+                val foodEntry = "Dada Ayam Bakar|$currentTime|${cal.toInt()} kkal|${addCarbs.toInt()}g C|${addProt.toInt()}g P"
+
+                val oldHistory = pref.getString("daily_food_history", "")
+                val newHistory = if (oldHistory.isNullOrEmpty()) foodEntry else "$oldHistory#$foodEntry"
+                editor.putString("daily_food_history", newHistory)
+
+                // --- 3. SIMPAN ANGKA AKUMULASI ---
                 editor.putFloat("consumed_calories", pref.getFloat("consumed_calories", 0f) + cal)
                 editor.putFloat("consumed_carbs", pref.getFloat("consumed_carbs", 0f) + addCarbs)
-                editor.putFloat("consumed_protein", pref.getFloat("consumed_protein", 0f) + addProtein)
+                editor.putFloat("consumed_protein", pref.getFloat("consumed_protein", 0f) + addProt)
+                editor.putFloat("consumed_sugar", pref.getFloat("consumed_sugar", 0f) + addSugar)
+                editor.putFloat("consumed_fat", pref.getFloat("consumed_fat", 0f) + addFat)
+
                 editor.apply()
 
-                // Update semua tampilan di Home
                 setupCaloriesProgressBar()
                 setupNutrientsProgressBar()
-
                 dialog.dismiss()
-                showCustomToast("Nutrisi berhasil ditambahkan!")
+                showCustomToast("Berhasil dicatat jam $currentTime")
             }
         }, 2000)
         dialog.setContentView(view)
