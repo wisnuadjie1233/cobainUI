@@ -387,40 +387,48 @@ class HomeActivity : AppCompatActivity() {
 
     private fun checkAndResetDailyData() {
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
-        val lastDate = sharedPref.getString("last_opened_date", "")
+        val lastDateStr = sharedPref.getString("last_opened_date", "")
 
         val calendar = Calendar.getInstance()
-        val currentDate = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
+        val currentDateStr = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
-        if (lastDate != "" && lastDate != currentDate) {
-            // --- SEBELUM DIRESET, KITA SIMPAN DATA KEMARIN KE GUDANG ---
+        if (lastDateStr != "" && lastDateStr != currentDateStr) {
             val editor = sharedPref.edit()
 
-            val caloriesKemarin = sharedPref.getFloat("consumed_calories", 0f)
-            val carbsKemarin = sharedPref.getFloat("consumed_carbs", 0f)
-            val proteinKemarin = sharedPref.getFloat("consumed_protein", 0f)
+            // --- 1. SEBELUM RESET, PINDAHKAN DATA KE GUDANG MINGGUAN ---
+            val yesterdayCal = Calendar.getInstance()
+            yesterdayCal.add(Calendar.DATE, -1)
 
-            // Simpan ke key khusus tanggal (misal: "calories_2026-04-06")
-            editor.putFloat("calories_$lastDate", caloriesKemarin)
-            editor.putFloat("carbs_$lastDate", carbsKemarin)
-            editor.putFloat("protein_$lastDate", proteinKemarin)
+            // GUNAKAN java.util.Locale.US di bawah ini:
+            val dayName = java.text.SimpleDateFormat("EEE", java.util.Locale.US).format(yesterdayCal.time)
 
-            // --- BARU SETELAH ITU RESET HOME JADI 0 ---
+            val consumedCal = sharedPref.getFloat("consumed_calories", 0f)
+            editor.putFloat("history_cal_$dayName", consumedCal)
+
+            // --- 2. JIKA HARI INI SENIN, RESET SELURUH GUDANG MINGGUAN ---
+            if (dayOfWeek == Calendar.MONDAY) {
+                val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                for (day in days) {
+                    editor.putFloat("history_cal_$day", 0f)
+                }
+            }
+
+            // --- 3. RESET PARAMETER HARIAN DI HOME JADI 0 ---
             editor.putFloat("consumed_calories", 0f)
             editor.putFloat("consumed_carbs", 0f)
             editor.putFloat("consumed_protein", 0f)
-            editor.putFloat("consumed_sugar", 0f) // Reset Gula
-            editor.putFloat("consumed_fat", 0f)   // Reset Lemak
+            editor.putFloat("consumed_sugar", 0f)
+            editor.putFloat("consumed_fat", 0f)
+            editor.putString("daily_food_history", "")
 
-            editor.putString("last_opened_date", currentDate)
-            editor.putString("daily_food_history", "") // Reset list jadi kosong
+            editor.putString("last_opened_date", currentDateStr)
             editor.apply()
 
             setupCaloriesProgressBar()
             setupNutrientsProgressBar()
-        } else if (lastDate == "") {
-            // Jika baru pertama kali instal
-            sharedPref.edit().putString("last_opened_date", currentDate).apply()
+        } else if (lastDateStr == "") {
+            sharedPref.edit().putString("last_opened_date", currentDateStr).apply()
         }
     }
 

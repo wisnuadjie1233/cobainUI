@@ -1,6 +1,7 @@
 package com.example.cobainui
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -13,89 +14,98 @@ class AnalysisHistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_analysis_history)
 
-        // 1. Tombol Kembali
-        val btnBack = findViewById<ImageButton>(R.id.btn_back_history)
-        btnBack?.setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_back_history)?.setOnClickListener {
             finish()
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         }
 
-        // 2. Ambil Data dari SharedPreferences (Cukup deklarasi 1x di sini)
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
-        val consumedCal = sharedPref.getFloat("consumed_calories", 0f)
-        val consumedCarbs = sharedPref.getFloat("consumed_carbs", 0f)
-        val consumedProtein = sharedPref.getFloat("consumed_protein", 0f)
-
-        // 3. Logika Rata-rata Mingguan (Senin + Selasa)
-        val seninCal = 1200f
-        val selasaCal = consumedCal
-        val avgCal = (seninCal + selasaCal) / 2
-
-        val tvAverageTotal = findViewById<TextView>(R.id.tv_average_total)
-        tvAverageTotal?.text = String.format(Locale.US, "%,.0f kkal", avgCal)
-
-        // 4. Logika Deteksi Hari Otomatis
         val calendar = Calendar.getInstance()
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
-        // --- SETUP GRAFIK MINGGUAN ---
-        setupBar(R.id.bar_senin, R.id.tv_val_senin, seninCal, dayOfWeek >= Calendar.MONDAY)
+        // 1. Ambil Data Real-time (Hari ini) dari Home
+        val consumedToday = sharedPref.getFloat("consumed_calories", 0f)
 
-        val selasaVal = if (dayOfWeek == Calendar.TUESDAY) consumedCal else if (dayOfWeek > Calendar.TUESDAY) 1500f else 0f
-        setupBar(R.id.bar_selasa, R.id.tv_val_selasa, selasaVal, dayOfWeek >= Calendar.TUESDAY)
+        // 2. Logika Pintar: Ambil dari Memori, kalau masih 0 pakai Data Simulasi (Dummy)
+        // Senin (Urutan 2 di Calendar)
+        val calMon = if (dayOfWeek == Calendar.MONDAY) consumedToday
+        else sharedPref.getFloat("history_cal_Mon", 1200f) // Default 1200 jika memori kosong
 
-        setupBar(R.id.bar_rabu, R.id.tv_val_rabu, 0f, dayOfWeek >= Calendar.WEDNESDAY)
-        setupBar(R.id.bar_kamis, R.id.tv_val_kamis, 0f, dayOfWeek >= Calendar.THURSDAY)
-        setupBar(R.id.bar_jumat, R.id.tv_val_jumat, 0f, dayOfWeek >= Calendar.FRIDAY)
-        setupBar(R.id.bar_sabtu, R.id.tv_val_sabtu, 0f, dayOfWeek >= Calendar.SATURDAY)
-        setupBar(R.id.bar_minggu, R.id.tv_val_minggu, 0f, dayOfWeek == Calendar.SUNDAY)
+        // Selasa (Urutan 3 di Calendar)
+        val calTue = if (dayOfWeek == Calendar.TUESDAY) consumedToday
+        else sharedPref.getFloat("history_cal_Tue", 1500f) // Default 1500 jika memori kosong
 
-        // 5. TAMPILKAN CATATAN HARIAN (LIST MAKANAN)
-        val tvFoodList = findViewById<TextView>(R.id.tv_food_list)
-        val historyData = sharedPref.getString("daily_food_history", "")
+        // Rabu (Urutan 4 di Calendar)
+        val calWed = if (dayOfWeek == Calendar.WEDNESDAY) consumedToday
+        else sharedPref.getFloat("history_cal_Wed", 0f)
 
-        if (!historyData.isNullOrEmpty()) {
-            val items = historyData.split("#")
-            val buildTeks = StringBuilder()
+        // Hari lainnya (Kamis-Minggu)
+        val calThu = if (dayOfWeek == Calendar.THURSDAY) consumedToday else sharedPref.getFloat("history_cal_Thu", 0f)
+        val calFri = if (dayOfWeek == Calendar.FRIDAY) consumedToday else sharedPref.getFloat("history_cal_Fri", 0f)
+        val calSat = if (dayOfWeek == Calendar.SATURDAY) consumedToday else sharedPref.getFloat("history_cal_Sat", 0f)
+        val calSun = if (dayOfWeek == Calendar.SUNDAY) consumedToday else sharedPref.getFloat("history_cal_Sun", 0f)
 
-            items.forEach { item ->
-                val detail = item.split("|")
-                if (detail.size == 3) {
-                    // Format: "Jam   Nama Makanan   Kalori"
-                    buildTeks.append("${detail[1]}      ${detail[0]}      ${detail[2]}\n\n")
-                }
-            }
-            tvFoodList?.text = buildTeks.toString()
-        } else {
-            tvFoodList?.text = "Belum ada catatan makan hari ini."
-        }
+        // 3. Hitung Rata-rata Berdasarkan Hari yang Sudah Dilewati (Senin=1, Selasa=2, Rabu=3, dst)
+        val urutanHari = if (dayOfWeek == Calendar.SUNDAY) 7 else dayOfWeek - 1
+        val totalMingguIni = calMon + calTue + calWed + calThu + calFri + calSat + calSun
+        val avgCal = totalMingguIni / urutanHari
 
-        // 6. Update Kartu Nutrisi (Protein & Karbo)
-        findViewById<TextView>(R.id.tv_protein_avg)?.text = "${consumedProtein.toInt()}g avg"
-        findViewById<TextView>(R.id.tv_carbs_avg)?.text = "${consumedCarbs.toInt()}g avg"
+        findViewById<TextView>(R.id.tv_average_total)?.text = String.format(Locale.US, "%,.0f kkal", avgCal)
+
+        // 4. Update Grafik Batang
+        setupBar(R.id.bar_senin, R.id.tv_val_senin, calMon, urutanHari >= 1)
+        setupBar(R.id.bar_selasa, R.id.tv_val_selasa, calTue, urutanHari >= 2)
+        setupBar(R.id.bar_rabu, R.id.tv_val_rabu, calWed, urutanHari >= 3)
+        setupBar(R.id.bar_kamis, R.id.tv_val_kamis, calThu, urutanHari >= 4)
+        setupBar(R.id.bar_jumat, R.id.tv_val_jumat, calFri, urutanHari >= 5)
+        setupBar(R.id.bar_sabtu, R.id.tv_val_sabtu, calSat, urutanHari >= 6)
+        setupBar(R.id.bar_minggu, R.id.tv_val_minggu, calSun, urutanHari >= 7)
+
+        // 5. Tampilkan Catatan & Nutrisi
+        updateNutrientCards(sharedPref)
+        displayFoodHistory(sharedPref)
     }
 
-    private fun setupBar(barId: Int, textId: Int, value: Float, isPastOrCurrentDay: Boolean) {
+    private fun setupBar(barId: Int, textId: Int, value: Float, isVisible: Boolean) {
         val bar = findViewById<ProgressBar>(barId)
         val text = findViewById<TextView>(textId)
-        val targetLimit = 2000f
+        val target = 2000f
 
-        if (isPastOrCurrentDay && value > 0) {
+        if (isVisible) {
             bar?.let {
-                it.max = targetLimit.toInt()
-                it.progress = if (value > targetLimit) targetLimit.toInt() else value.toInt()
+                it.max = target.toInt()
+                it.progress = if (value > target) target.toInt() else value.toInt()
                 it.alpha = 1.0f
             }
-            if (value >= 1000) {
-                text?.text = String.format(Locale.US, "%.2fk", value / 1000)
-            } else {
-                text?.text = value.toInt().toString()
-            }
-            text?.visibility = android.view.View.VISIBLE
+            text?.text = if (value >= 1000) String.format(Locale.US, "%.2fk", value / 1000)
+            else value.toInt().toString()
+            text?.visibility = View.VISIBLE
         } else {
             bar?.progress = 0
-            bar?.alpha = 0.3f
-            text?.visibility = android.view.View.INVISIBLE
+            bar?.alpha = 0.2f
+            text?.visibility = View.INVISIBLE
         }
+    }
+
+    private fun displayFoodHistory(pref: android.content.SharedPreferences) {
+        val tvFoodList = findViewById<TextView>(R.id.tv_food_list)
+        val data = pref.getString("daily_food_history", "")
+        if (!data.isNullOrEmpty()) {
+            val build = StringBuilder()
+            data.split("#").forEach {
+                val d = it.split("|")
+                if (d.size >= 3) build.append("${d[1]}      ${d[0]}      ${d[2]}\n\n")
+            }
+            tvFoodList?.text = build.toString()
+        } else {
+            tvFoodList?.text = "Belum ada catatan hari ini."
+        }
+    }
+
+    private fun updateNutrientCards(pref: android.content.SharedPreferences) {
+        findViewById<TextView>(R.id.tv_protein_avg)?.text = "${pref.getFloat("consumed_protein", 0f).toInt()}g avg"
+        findViewById<TextView>(R.id.tv_carbs_avg)?.text = "${pref.getFloat("consumed_carbs", 0f).toInt()}g avg"
+        findViewById<TextView>(R.id.tv_sugar_avg)?.text = "${pref.getFloat("consumed_sugar", 0f).toInt()}g avg"
+        findViewById<TextView>(R.id.tv_fat_avg)?.text = "${pref.getFloat("consumed_fat", 0f).toInt()}g avg"
     }
 }
