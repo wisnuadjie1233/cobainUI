@@ -53,37 +53,56 @@ class AnalysisHistoryActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tv_average_total)?.text = String.format(Locale.US, "%,.0f kkal", avgCal)
 
         // 4. Update Grafik Batang
-        setupBar(R.id.bar_senin, R.id.tv_val_senin, calMon, urutanHari >= 1)
-        setupBar(R.id.bar_selasa, R.id.tv_val_selasa, calTue, urutanHari >= 2)
-        setupBar(R.id.bar_rabu, R.id.tv_val_rabu, calWed, urutanHari >= 3)
-        setupBar(R.id.bar_kamis, R.id.tv_val_kamis, calThu, urutanHari >= 4)
-        setupBar(R.id.bar_jumat, R.id.tv_val_jumat, calFri, urutanHari >= 5)
-        setupBar(R.id.bar_sabtu, R.id.tv_val_sabtu, calSat, urutanHari >= 6)
-        setupBar(R.id.bar_minggu, R.id.tv_val_minggu, calSun, urutanHari >= 7)
+        /*
+        setupBar(R.id.bar_senin, R.id.tv_targetlabel_senin, calMon, urutanHari >= 1)
+        setupBar(R.id.bar_selasa, R.id.tv_targetlabel_selasa, calTue, urutanHari >= 2)
+        setupBar(R.id.bar_rabu, R.id.tv_targetlabel_rabu, calWed, urutanHari >= 3)
+        setupBar(R.id.bar_kamis, R.id.tv_targetlabel_kamis, calThu, urutanHari >= 4)
+        setupBar(R.id.bar_jumat, R.id.tv_targetlabel_jumat, calFri, urutanHari >= 5)
+        setupBar(R.id.bar_sabtu, R.id.tv_targetlabel_sabtu, calSat, urutanHari >= 6)
+        setupBar(R.id.bar_minggu, R.id.tv_targetlabel_minggu, calSun, urutanHari >= 7)
+        */
+        // 4. Update Grafik Batang (Urutan: Bar ID, Value Text ID, Target Label ID, Nilai Kalori, IsVisible)
+        setupBar(R.id.bar_senin, R.id.tv_val_senin, R.id.tv_targetlabel_senin, calMon, urutanHari >= 1)
+        setupBar(R.id.bar_selasa, R.id.tv_val_selasa, R.id.tv_targetlabel_selasa, calTue, urutanHari >= 2)
+        setupBar(R.id.bar_rabu, R.id.tv_val_rabu, R.id.tv_targetlabel_rabu, calWed, urutanHari >= 3)
+        setupBar(R.id.bar_kamis, R.id.tv_val_kamis, R.id.tv_targetlabel_kamis, calThu, urutanHari >= 4)
+        setupBar(R.id.bar_jumat, R.id.tv_val_jumat, R.id.tv_targetlabel_jumat, calFri, urutanHari >= 5)
+        setupBar(R.id.bar_sabtu, R.id.tv_val_sabtu, R.id.tv_targetlabel_sabtu, calSat, urutanHari >= 6)
+        setupBar(R.id.bar_minggu, R.id.tv_val_minggu, R.id.tv_targetlabel_minggu, calSun, urutanHari >= 7)
 
         // 5. Tampilkan Catatan & Nutrisi
         updateNutrientCards(sharedPref)
         displayFoodHistory(sharedPref)
     }
 
-    private fun setupBar(barId: Int, textId: Int, value: Float, isVisible: Boolean) {
+    private fun setupBar(barId: Int, textId: Int, targetLabelId: Int, value: Float, isVisible: Boolean) {
         val bar = findViewById<ProgressBar>(barId)
-        val text = findViewById<TextView>(textId)
-        val target = 2000f
+        val textVal = findViewById<TextView>(textId)
+        val textTarget = findViewById<TextView>(targetLabelId)
+
+        val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
+        val targetUser = sharedPref.getFloat("daily_target_calories", 2000f)
+
+        // 1. Update Tulisan Target di Atas Batang (misal 2.0k jadi 1.8k)
+        textTarget?.text = String.format(Locale.US, "%.1fk", targetUser / 1000)
 
         if (isVisible) {
             bar?.let {
-                it.max = target.toInt()
-                it.progress = if (value > target) target.toInt() else value.toInt()
+                it.max = targetUser.toInt()
+                // Logika STUCK agar tidak meluber
+                it.progress = if (value > targetUser) targetUser.toInt() else value.toInt()
                 it.alpha = 1.0f
             }
-            text?.text = if (value >= 1000) String.format(Locale.US, "%.2fk", value / 1000)
+
+            // Tampilkan realisasi (angka di tengah batang)
+            textVal?.text = if (value >= 1000) String.format(Locale.US, "%.2fk", value / 1000)
             else value.toInt().toString()
-            text?.visibility = View.VISIBLE
+            textVal?.visibility = View.VISIBLE
         } else {
             bar?.progress = 0
             bar?.alpha = 0.2f
-            text?.visibility = View.INVISIBLE
+            textVal?.visibility = View.INVISIBLE
         }
     }
 

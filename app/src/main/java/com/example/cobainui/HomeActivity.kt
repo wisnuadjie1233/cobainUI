@@ -225,36 +225,43 @@ class HomeActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
         val consumed = sharedPref.getFloat("consumed_calories", 0f)
 
-        // 1. Tentukan batas maksimal visual (Batas Macet)
-        val batasMacet = 2000f
-        val targetFull = 4000f // Kapasitas wadah grafik
+        // Ambil target hasil hitungan profil (Misal: 2500), default 2000 jika belum isi profil
+        val targetUser = sharedPref.getFloat("daily_target_calories", 2000f)
 
-        // 2. Atur wadah grafik
+        // --- SESUAI PERMINTAANMU: TETAP PAKAI 2 PARAMETER INI ---
+
+        // 1. Batas Macet (Kapan bar berhenti bergerak secara visual)
+        // Kita set sesuai target personal user agar bar berhenti tepat saat target tercapai
+        val batasMacet = targetUser
+
+        // 2. Target Full (Kapasitas total wadah grafik/track ungu)
+        // Kita samakan dengan targetUser agar bar terlihat 100% penuh saat mencapai target
+        val targetFull = targetUser*2
+
+        // --- IMPLEMENTASI KE PROGRESS BAR ---
+
+        // Atur kapasitas maksimal wadah (track ungu)
         caloriesProgressBar.progressMax = targetFull
 
-        // 3. LOGIKA BIAR STUCK:
-        // Jika kalori yang dimakan sudah mencapai atau melewati 500
+        // Logika STUCK (Visual Clamping)
         if (consumed >= batasMacet) {
-            // PAKSA bar berhenti di angka 500 (diem/stuck)
+            // PAKSA bar berhenti di batas macet agar tidak meluber/overlap
             caloriesProgressBar.progress = batasMacet
         } else {
-            // Jika masih di bawah 500, gerakkan bar secara normal
+            // Gerakkan bar secara normal mengikuti kalori yang dimakan
             caloriesProgressBar.progress = consumed
         }
 
+        // 3. Indikator Warna (Relatif terhadap target user)
         val color = when {
-            consumed <= 2000 -> android.graphics.Color.BLACK // Normal (Hitam)
-            consumed <= 2300 -> android.graphics.Color.parseColor("#FBC02D") // Over dikit (Kuning)
-            consumed <= 2600 -> android.graphics.Color.parseColor("#F57C00") // Over sedang (Oren)
-            else -> android.graphics.Color.parseColor("#D32F2F") // Bahaya (Merah)
+            consumed <= targetUser -> android.graphics.Color.BLACK // Aman
+            consumed <= targetUser + 300 -> android.graphics.Color.parseColor("#FBC02D") // Kuning
+            consumed <= targetUser + 600 -> android.graphics.Color.parseColor("#F57C00") // Oren
+            else -> android.graphics.Color.parseColor("#D32F2F") // Merah
         }
-
-        // Set warna bar-nya
         caloriesProgressBar.progressBarColor = color
 
-
-        // 4. UPDATE TEKS (Teks tidak ikut stuck, tetap angka asli)
-        // Jadi kalau sudah scan lagi dan jadi 600, teks tulis 600, tapi bar tetap di posisi 500
+        // 4. Update Teks (Tetap jujur menampilkan angka asli meskipun bar sudah macet)
         tvCaloriesValue.text = consumed.toInt().toString()
     }
 

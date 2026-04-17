@@ -1,17 +1,22 @@
 package com.example.cobainui
 
+import android.app.DatePickerDialog
 import android.os.Bundle
-import android.widget.ImageButton
-import android.widget.Toast
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import java.util.*
 
 class EditProfileActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private var selectedCalendar = Calendar.getInstance()
+    private var userAge = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,72 +24,132 @@ class EditProfileActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
+        val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
 
+        // Inisialisasi View (Pastikan ID ini ada di XML kamu)
         val btnBack = findViewById<ImageButton>(R.id.btn_back_edit_profile)
         val etName = findViewById<TextInputEditText>(R.id.et_edit_name)
-        val etEmail = findViewById<TextInputEditText>(R.id.et_edit_email)
+        val etWeight = findViewById<TextInputEditText>(R.id.et_edit_weight) // Input BB
+        val etHeight = findViewById<TextInputEditText>(R.id.et_edit_height) // Input TB
+        val btnBirthDate = findViewById<Button>(R.id.btn_birth_date)        // Tombol Tgl Lahir
+        val spinnerGender = findViewById<Spinner>(R.id.spinner_gender)      // Pilih Gender
         val btnSave = findViewById<MaterialButton>(R.id.btn_save_profile)
 
-        // 1. Ambil data user dan simpan nama awal untuk perbandingan
-        val initialName = currentUser?.displayName ?: "" // TAMBAHKAN BARIS INI
+        // 1. Load Data Lama (Jika ada)
+        val initialName = currentUser?.displayName ?: ""
+        val initialWeight = sharedPref.getFloat("user_weight", 0f)
+        val initialHeight = sharedPref.getFloat("user_height", 0f)
+        val initialGender = sharedPref.getString("user_gender", "Pria") ?: "Pria"
 
-        if (currentUser != null) {
-            etName.setText(initialName)
-            etEmail.setText(currentUser.email)
+        etName.setText(initialName)
+        if (initialWeight > 0) etWeight.setText(initialWeight.toString())
+        if (initialHeight > 0) etHeight.setText(initialHeight.toString())
+
+        // 2. Setup Spinner Gender
+        val genders = arrayOf("Pria", "Wanita")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, genders)
+        spinnerGender.adapter = adapter
+        spinnerGender.setSelection(if (initialGender == "Pria") 0 else 1)
+
+        // --- Load Data User saat Activity dibuka ---
+        val etEmail = findViewById<TextInputEditText>(R.id.et_edit_email)
+
+// Tampilkan email asli dari Firebase
+        etEmail.setText(currentUser?.email ?: "Tidak ada email")
+
+// Tambahkan juga pengambilan data tanggal lahir/umur jika sudah tersimpan
+        userAge = sharedPref.getInt("user_age", 0)
+        val savedWeight = sharedPref.getFloat("user_weight", 0f)
+        val savedHeight = sharedPref.getFloat("user_height", 0f)
+
+        if (userAge > 0) {
+            btnBirthDate.text = "Umur: $userAge Tahun"
         }
 
-        // SET TOMBOL MATI SAAT PERTAMA KALI DIBUKA
-        btnSave.isEnabled = false
-        btnSave.alpha = 0.5f
+        // 3. Setup DatePicker (Hitung Umur)
+        btnBirthDate.setOnClickListener {
+            val datePicker = DatePickerDialog(this, { _, year, month, day ->
+                selectedCalendar.set(year, month, day)
+                val today = Calendar.getInstance()
+                userAge = today.get(Calendar.YEAR) - year
+                if (today.get(Calendar.DAY_OF_YEAR) < selectedCalendar.get(Calendar.DAY_OF_YEAR)) userAge--
 
-        // 2. Logika Tombol Kembali
+                btnBirthDate.text = "$day/${month + 1}/$year (Umur: $userAge)"
+                checkChanges(etName, initialName, btnSave)
+            }, 2000, 0, 1)
+            datePicker.show()
+        }
+
+        // 4. Tombol Kembali
         btnBack.setOnClickListener {
             finish()
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         }
 
-        etName.addTextChangedListener(object : android.text.TextWatcher {
+        // 5. Pantau Perubahan (Agar tombol Simpan Nyala)
+        val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val hasChanged = etName.text.toString().trim() != initialName ||
+                        etWeight.text.toString() != initialWeight.toString() ||
+                        etHeight.text.toString() != initialHeight.toString()
 
-            override fun afterTextChanged(s: android.text.Editable?) {
-                val currentName = s.toString().trim()
-
-                // Cek: Apakah teks sekarang berbeda dengan nama awal?
-                val isChanged = currentName != initialName && currentName.isNotEmpty()
-
-                if (isChanged) {
-                    btnSave.isEnabled = true
-                    btnSave.alpha = 1.0f // Terang (Aktif)
-                } else {
-                    btnSave.isEnabled = false
-                    btnSave.alpha = 0.5f // Redup (Mati)
-                }
+                btnSave.isEnabled = hasChanged && etWeight.text!!.isNotEmpty() && etHeight.text!!.isNotEmpty()
+                btnSave.alpha = if (btnSave.isEnabled) 1.0f else 0.5f
             }
-        })
+        }
+        etName.addTextChangedListener(watcher)
+        etWeight.addTextChangedListener(watcher)
+        etHeight.addTextChangedListener(watcher)
 
-        // 3. Logika Simpan Perubahan
+        // 6. Logika Simpan & Hitung Kalori
+        // 6. Logika Simpan & Hitung Kalori
         btnSave.setOnClickListener {
-            val newName = etName.text.toString().trim()
+            val name = etName.text.toString().trim()
+            val weightStr = etWeight.text.toString()
+            val heightStr = etHeight.text.toString()
 
-            if (newName.isEmpty()) {
-                etName.error = "Nama tidak boleh kosong"
+            if (weightStr.isEmpty() || heightStr.isEmpty()) {
+                Toast.makeText(this, "Mohon isi berat dan tinggi badan", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val profileUpdates = UserProfileChangeRequest.Builder()
-                .setDisplayName(newName)
-                .build()
+            val weight = weightStr.toFloat()
+            val height = heightStr.toFloat()
+            val gender = spinnerGender.selectedItem.toString()
 
-            currentUser?.updateProfile(profileUpdates)
-                ?.addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(this, "Profil diperbarui!", Toast.LENGTH_SHORT).show()
-                        finish() // Balik ke halaman pengaturan
-                    } else {
-                        Toast.makeText(this, "Gagal memperbarui profil", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            // HITUNG PAKAI RUMUS MIFFLIN-ST JEOR
+            // Kita tambahkan .toFloat() di akhir perhitungan agar tidak error 'Double'
+            val bmr = if (gender == "Pria") {
+                (10 * weight) + (6.25 * height) - (5 * userAge) + 5
+            } else {
+                (10 * weight) + (6.25 * height) - (5 * userAge) - 161
+            }
+
+            // Paksa hasil perkalian menjadi Float
+            val targetCalories = (bmr * 1.2).toFloat()
+
+            // Simpan ke SharedPreferences
+            val editor = sharedPref.edit()
+            editor.putFloat("user_weight", weight)
+            editor.putFloat("user_height", height)
+            editor.putString("user_gender", gender)
+            editor.putInt("user_age", userAge)
+            editor.putFloat("daily_target_calories", targetCalories) // Karakter <caret> sudah dibuang
+            editor.apply()
+
+            // Update Nama di Firebase
+            val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(name).build()
+            currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener {
+                Toast.makeText(this, "Target Baru: ${targetCalories.toInt()} kkal", Toast.LENGTH_LONG).show()
+                finish()
+            }
         }
+    }
+
+    private fun checkChanges(etName: EditText, initial: String, btn: Button) {
+        btn.isEnabled = etName.text.toString().trim() != initial || userAge > 0
+        btn.alpha = if (btn.isEnabled) 1.0f else 0.5f
     }
 }

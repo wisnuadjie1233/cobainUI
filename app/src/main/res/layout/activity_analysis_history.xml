@@ -103,6 +103,7 @@
 
                             <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
                             <TextView
+                                android:id="@+id/tv_targetlabel_senin"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2.0k"
@@ -152,6 +153,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/tv_targetlabel_selasa"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2.0k"
@@ -199,6 +201,7 @@
 
                             <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
                             <TextView
+                                android:id="@+id/tv_targetlabel_rabu"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2.0k"
@@ -249,6 +252,7 @@
 
                             <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
                             <TextView
+                                android:id="@+id/tv_targetlabel_kamis"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2.0k"
@@ -300,6 +304,7 @@
 
                             <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
                             <TextView
+                                android:id="@+id/tv_targetlabel_jumat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2.0k"
@@ -351,6 +356,7 @@
 
                             <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
                             <TextView
+                                android:id="@+id/tv_targetlabel_sabtu"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2.0k"
@@ -402,6 +408,7 @@
 
                             <!-- INFO 1: TARGET (Sekarang berada tepat di atas batang) -->
                             <TextView
+                                android:id="@+id/tv_targetlabel_minggu"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2.0k"
