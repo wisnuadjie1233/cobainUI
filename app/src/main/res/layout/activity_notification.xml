@@ -2,51 +2,106 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="?android:attr/colorBackground"
-    android:padding="24dp">
+    android:background="?android:attr/windowBackground"
+    android:fitsSystemWindows="true">
 
-    <!-- Tombol Back -->
-
-    <!-- Konten Tengah (Empty State) -->
-
+    <!-- Tombol Back (Standalone - Sama dengan Riwayat Analisis) -->
     <ImageButton
         android:id="@+id/btn_back"
-        android:layout_width="47dp"
+        android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:background="@android:color/transparent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Judul Header -->
     <TextView
+        android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
+        android:layout_marginStart="16dp"
         android:fontFamily="@font/spacelight"
         android:text="Notifications"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/btn_back"
         app:layout_constraintStart_toEndOf="@+id/btn_back"
-        app:layout_constraintTop_toTopOf="@+id/btn_back"
-        app:layout_constraintVertical_bias="0.529" />
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
-    <ImageView
-        android:id="@+id/img_empty"
-        android:layout_width="271dp"
-        android:layout_height="331dp"
-        android:src="@drawable/isinotif"
+    <!-- Area Tengah (Empty State) -->
+    <LinearLayout
+        android:id="@+id/layout_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.409" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_back"
+        app:layout_constraintVertical_bias="0.4">
 
+        <ImageView
+            android:id="@+id/img_empty"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:src="@drawable/isinotif"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/spacelight"
+            android:text="No notifications yet."
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/spacelight"
+            android:gravity="center"
+            android:text="Your healthy habits are on track—keep it up!"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Kartu Notifikasi (Untuk Gimmick AI - Awalnya Hilang) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="?attr/colorSurfaceVariant"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tv_notification_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/spacelight"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="14sp"
+                android:text="Memuat pesan..." />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

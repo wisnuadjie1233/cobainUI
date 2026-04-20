@@ -507,7 +507,15 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="16dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Karbo" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/spacelight"
+                            android:text="Karbo"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="12sp" />
+
                         <TextView android:id="@+id/tv_carbs_avg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/spacelight" android:layout_marginTop="4dp" android:text="140g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
