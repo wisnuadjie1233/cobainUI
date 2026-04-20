@@ -23,46 +23,29 @@ class AnalysisHistoryActivity : AppCompatActivity() {
         val calendar = Calendar.getInstance()
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
-        // 1. Ambil Data Real-time (Hari ini) dari Home
+        // 1. Ambil Data Hari Ini dari Home
         val consumedToday = sharedPref.getFloat("consumed_calories", 0f)
 
-        // 2. Logika Pintar: Ambil dari Memori, kalau masih 0 pakai Data Simulasi (Dummy)
-        // Senin (Urutan 2 di Calendar)
-        val calMon = if (dayOfWeek == Calendar.MONDAY) consumedToday
-        else sharedPref.getFloat("history_cal_Mon", 1200f) // Default 1200 jika memori kosong
-
-        // Selasa (Urutan 3 di Calendar)
-        val calTue = if (dayOfWeek == Calendar.TUESDAY) consumedToday
-        else sharedPref.getFloat("history_cal_Tue", 1500f) // Default 1500 jika memori kosong
-
-        // Rabu (Urutan 4 di Calendar)
-        val calWed = if (dayOfWeek == Calendar.WEDNESDAY) consumedToday
-        else sharedPref.getFloat("history_cal_Wed", 0f)
-
-        // Hari lainnya (Kamis-Minggu)
+        // 2. Ambil Data "Gudang" (History). Jika kosong, sekarang default-nya 0f (JUJUR)
+        val calMon = if (dayOfWeek == Calendar.MONDAY) consumedToday else sharedPref.getFloat("history_cal_Mon", 0f)
+        val calTue = if (dayOfWeek == Calendar.TUESDAY) consumedToday else sharedPref.getFloat("history_cal_Tue", 0f)
+        val calWed = if (dayOfWeek == Calendar.WEDNESDAY) consumedToday else sharedPref.getFloat("history_cal_Wed", 0f)
         val calThu = if (dayOfWeek == Calendar.THURSDAY) consumedToday else sharedPref.getFloat("history_cal_Thu", 0f)
         val calFri = if (dayOfWeek == Calendar.FRIDAY) consumedToday else sharedPref.getFloat("history_cal_Fri", 0f)
         val calSat = if (dayOfWeek == Calendar.SATURDAY) consumedToday else sharedPref.getFloat("history_cal_Sat", 0f)
         val calSun = if (dayOfWeek == Calendar.SUNDAY) consumedToday else sharedPref.getFloat("history_cal_Sun", 0f)
 
-        // 3. Hitung Rata-rata Berdasarkan Hari yang Sudah Dilewati (Senin=1, Selasa=2, Rabu=3, dst)
+        // 3. Logika Rata-rata (Hanya membagi hari yang sudah dilewati)
         val urutanHari = if (dayOfWeek == Calendar.SUNDAY) 7 else dayOfWeek - 1
         val totalMingguIni = calMon + calTue + calWed + calThu + calFri + calSat + calSun
-        val avgCal = totalMingguIni / urutanHari
 
-        findViewById<TextView>(R.id.tv_average_total)?.text = String.format(Locale.US, "%,.0f kkal", avgCal)
+        // Menghindari pembagian dengan nol
+        val avgCal = if (urutanHari > 0) totalMingguIni / urutanHari else 0f
 
-        // 4. Update Grafik Batang
-        /*
-        setupBar(R.id.bar_senin, R.id.tv_targetlabel_senin, calMon, urutanHari >= 1)
-        setupBar(R.id.bar_selasa, R.id.tv_targetlabel_selasa, calTue, urutanHari >= 2)
-        setupBar(R.id.bar_rabu, R.id.tv_targetlabel_rabu, calWed, urutanHari >= 3)
-        setupBar(R.id.bar_kamis, R.id.tv_targetlabel_kamis, calThu, urutanHari >= 4)
-        setupBar(R.id.bar_jumat, R.id.tv_targetlabel_jumat, calFri, urutanHari >= 5)
-        setupBar(R.id.bar_sabtu, R.id.tv_targetlabel_sabtu, calSat, urutanHari >= 6)
-        setupBar(R.id.bar_minggu, R.id.tv_targetlabel_minggu, calSun, urutanHari >= 7)
-        */
-        // 4. Update Grafik Batang (Urutan: Bar ID, Value Text ID, Target Label ID, Nilai Kalori, IsVisible)
+        val tvAverageTotal = findViewById<TextView>(R.id.tv_average_total)
+        tvAverageTotal?.text = String.format(Locale.US, "%,.0f kkal", avgCal)
+
+        // 4. Update Grafik Batang (Tampil sesuai urutan hari)
         setupBar(R.id.bar_senin, R.id.tv_val_senin, R.id.tv_targetlabel_senin, calMon, urutanHari >= 1)
         setupBar(R.id.bar_selasa, R.id.tv_val_selasa, R.id.tv_targetlabel_selasa, calTue, urutanHari >= 2)
         setupBar(R.id.bar_rabu, R.id.tv_val_rabu, R.id.tv_targetlabel_rabu, calWed, urutanHari >= 3)
@@ -71,7 +54,7 @@ class AnalysisHistoryActivity : AppCompatActivity() {
         setupBar(R.id.bar_sabtu, R.id.tv_val_sabtu, R.id.tv_targetlabel_sabtu, calSat, urutanHari >= 6)
         setupBar(R.id.bar_minggu, R.id.tv_val_minggu, R.id.tv_targetlabel_minggu, calSun, urutanHari >= 7)
 
-        // 5. Tampilkan Catatan & Nutrisi
+        // 5. Tampilkan Catatan Harian & Nutrisi lainnya
         updateNutrientCards(sharedPref)
         displayFoodHistory(sharedPref)
     }
@@ -84,24 +67,27 @@ class AnalysisHistoryActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
         val targetUser = sharedPref.getFloat("daily_target_calories", 2000f)
 
-        // 1. Update Tulisan Target di Atas Batang (misal 2.0k jadi 1.8k)
+        // Update Label Target di atas (misal 2.5k)
         textTarget?.text = String.format(Locale.US, "%.1fk", targetUser / 1000)
 
-        if (isVisible) {
-            bar?.let {
-                it.max = targetUser.toInt()
-                // Logika STUCK agar tidak meluber
-                it.progress = if (value > targetUser) targetUser.toInt() else value.toInt()
-                it.alpha = 1.0f
-            }
+        // --- PERBAIKAN ALPHA DI SINI ---
+        bar?.let {
+            it.max = targetUser.toInt()
+            it.progress = if (value > targetUser) targetUser.toInt() else value.toInt()
 
-            // Tampilkan realisasi (angka di tengah batang)
-            textVal?.text = if (value >= 1000) String.format(Locale.US, "%.2fk", value / 1000)
-            else value.toInt().toString()
+            // Set alpha selalu 1.0f agar warna wadah abu-abunya seragam semua hari
+            it.alpha = 0.2f
+        }
+
+        if (isVisible) {
+            // Tampilkan angka (0 atau ribuan) hanya untuk hari yang sudah lewat/hari ini
+            textVal?.text = when {
+                value >= 1000 -> String.format(Locale.US, "%.2fk", value / 1000)
+                else -> value.toInt().toString()
+            }
             textVal?.visibility = View.VISIBLE
         } else {
-            bar?.progress = 0
-            bar?.alpha = 0.2f
+            // Hari esok: Sembunyikan teks angkanya saja, wadah ProgressBar tetap terlihat sama
             textVal?.visibility = View.INVISIBLE
         }
     }
@@ -117,7 +103,7 @@ class AnalysisHistoryActivity : AppCompatActivity() {
             }
             tvFoodList?.text = build.toString()
         } else {
-            tvFoodList?.text = "Belum ada catatan hari ini."
+            tvFoodList?.text = "Belum ada catatan makan hari ini."
         }
     }
 
