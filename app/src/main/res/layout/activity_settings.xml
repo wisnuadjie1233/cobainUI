@@ -15,8 +15,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?android:attr/textColorPrimary" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -156,7 +155,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/karbo"
+                        android:src="@drawable/settingkalori"
                         app:tint="#FF7043" />
 
                     <TextView
