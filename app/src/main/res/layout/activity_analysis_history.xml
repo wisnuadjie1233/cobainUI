@@ -25,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:fontFamily="@font/spacelight"
+        android:fontFamily="@font/actor"
         android:text="Riwayat Analisis"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="22sp"
@@ -68,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Rata-rata Minggu Ini"
-                        android:fontFamily="@font/spacelight"
+                        android:fontFamily="@font/actor"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="14sp"
                         android:textStyle="bold"
@@ -78,7 +78,7 @@
                         android:id="@+id/tv_average_total"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/spacelight"
+                        android:fontFamily="@font/actor"
                         android:text="1,850 kkal"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="28sp"
@@ -108,7 +108,7 @@
                                 android:text="2.0k"
                                 android:textSize="8sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:fontFamily="@font/spacelight"
+                                android:fontFamily="@font/actor"
                                 android:textStyle="bold"/>
 
                             <FrameLayout
@@ -133,7 +133,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
                                     android:text="1.8k"
-                                    android:fontFamily="@font/spacelight"
+                                    android:fontFamily="@font/actor"
                                     android:textSize="9sp"
                                     android:textColor="#FFFFFF"
                                     android:textStyle="bold" />
@@ -155,7 +155,7 @@
                                 android:text="2.0k"
                                 android:textSize="8sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:fontFamily="@font/spacelight"
+                                android:fontFamily="@font/actor"
                                 android:textStyle="bold"/>
 
                             <FrameLayout
@@ -203,7 +203,7 @@
                                 android:text="2.0k"
                                 android:textSize="8sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:fontFamily="@font/spacelight"
+                                android:fontFamily="@font/actor"
                                 android:textStyle="bold" />
 
                             <!-- Wadah Batang + Angka di Dalamnya -->
@@ -254,7 +254,7 @@
                                 android:text="2.0k"
                                 android:textSize="8sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:fontFamily="@font/spacelight"
+                                android:fontFamily="@font/actor"
                                 android:textStyle="bold" />
 
                             <!-- Wadah Batang + Angka di Dalamnya -->
@@ -306,7 +306,7 @@
                                 android:text="2.0k"
                                 android:textSize="8sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:fontFamily="@font/spacelight"
+                                android:fontFamily="@font/actor"
                                 android:textStyle="bold" />
 
                             <!-- Wadah Batang + Angka di Dalamnya -->
@@ -358,7 +358,7 @@
                                 android:text="2.0k"
                                 android:textSize="8sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:fontFamily="@font/spacelight"
+                                android:fontFamily="@font/actor"
                                 android:textStyle="bold" />
 
                             <!-- Wadah Batang + Angka di Dalamnya -->
@@ -410,7 +410,7 @@
                                 android:text="2.0k"
                                 android:textSize="8sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:fontFamily="@font/spacelight"
+                                android:fontFamily="@font/actor"
                                 android:textStyle="bold" />
 
                             <!-- Wadah Batang + Angka di Dalamnya -->
@@ -454,13 +454,13 @@
                         android:layout_marginTop="8dp"
                         android:orientation="horizontal"
                         android:weightSum="7">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Senin" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Selasa" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Rabu" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Kamis" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Jumat" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sabtu" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Minggu" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Senin" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Selasa" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Rabu" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Kamis" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Jumat" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sabtu" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Minggu" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="8sp" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -485,8 +485,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="16dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Protein" android:fontFamily="@font/spacelight" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
-                        <TextView android:id="@+id/tv_protein_avg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/spacelight" android:text="65g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Protein" android:fontFamily="@font/actor" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tv_protein_avg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/actor" android:text="65g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -507,12 +507,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/spacelight"
+                            android:fontFamily="@font/actor"
                             android:text="Karbo"
                             android:textColor="?android:attr/textColorSecondary"
                             android:textSize="12sp" />
 
-                        <TextView android:id="@+id/tv_carbs_avg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/spacelight" android:layout_marginTop="4dp" android:text="140g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
+                        <TextView android:id="@+id/tv_carbs_avg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/actor" android:layout_marginTop="4dp" android:text="140g avg" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -534,7 +534,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Gula"
-                            android:fontFamily="@font/spacelight"
+                            android:fontFamily="@font/actor"
                             android:textColor="?android:attr/textColorSecondary"
                             android:textSize="12sp"/>
                         <TextView
@@ -543,7 +543,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="25g avg"
-                            android:fontFamily="@font/spacelight"
+                            android:fontFamily="@font/actor"
                             android:textColor="?android:attr/textColorPrimary"
                             android:textStyle="bold"/>
                     </LinearLayout>
@@ -567,7 +567,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Lemak"
-                            android:fontFamily="@font/spacelight"
+                            android:fontFamily="@font/actor"
                             android:textColor="?android:attr/textColorSecondary"
                             android:textSize="12sp" />
                         <TextView
@@ -576,7 +576,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="50g avg"
-                            android:fontFamily="@font/spacelight"
+                            android:fontFamily="@font/actor"
                             android:textColor="?android:attr/textColorPrimary"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -589,7 +589,7 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="16dp"
                 android:text="Catatan Harian"
-                android:fontFamily="@font/spacelight"
+                android:fontFamily="@font/actor"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="14sp" />
 
@@ -601,7 +601,7 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="Belum ada catatan makan hari ini."
-                android:fontFamily="@font/spacelight"
+                android:fontFamily="@font/actor"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="14sp" />
 

@@ -221,38 +221,37 @@ class HomeActivity : AppCompatActivity() {
     private fun setupCaloriesProgressBar() {
         val caloriesProgressBar = findViewById<CircularProgressBar>(R.id.calories_progress_bar)
         val tvCaloriesValue = findViewById<TextView>(R.id.calories_text)
+        val tvMaxLabel = findViewById<TextView>(R.id.tv_max_calories)
 
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
         val consumed = sharedPref.getFloat("consumed_calories", 0f)
 
-        // Ambil target hasil hitungan profil (Misal: 2500), default 2000 jika belum isi profil
+        // Ambil target hasil hitungan profil, default 2000f jika belum ada data
         val targetUser = sharedPref.getFloat("daily_target_calories", 2000f)
-
-        // --- SESUAI PERMINTAANMU: TETAP PAKAI 2 PARAMETER INI ---
-
-        // 1. Batas Macet (Kapan bar berhenti bergerak secara visual)
-        // Kita set sesuai target personal user agar bar berhenti tepat saat target tercapai
+        tvMaxLabel.text = targetUser.toInt().toString()
+        // 1. Batas Macet (Bar berhenti bergerak secara visual tepat di target user)
         val batasMacet = targetUser
 
         // 2. Target Full (Kapasitas total wadah grafik/track ungu)
-        // Kita samakan dengan targetUser agar bar terlihat 100% penuh saat mencapai target
-        val targetFull = targetUser*2
+        // Rumusmu: Target + 30%. Kita paksa ke Float agar tidak error merah
+        val targetFull = (targetUser + (targetUser * 0.3f)).toFloat()
 
         // --- IMPLEMENTASI KE PROGRESS BAR ---
 
-        // Atur kapasitas maksimal wadah (track ungu)
+        // Set kapasitas maksimal wadah
         caloriesProgressBar.progressMax = targetFull
 
         // Logika STUCK (Visual Clamping)
         if (consumed >= batasMacet) {
-            // PAKSA bar berhenti di batas macet agar tidak meluber/overlap
+            // Bar berhenti di ujung target (tidak meluber ke area 30% tambahan)
             caloriesProgressBar.progress = batasMacet
         } else {
-            // Gerakkan bar secara normal mengikuti kalori yang dimakan
+            // Gerakkan bar secara normal
             caloriesProgressBar.progress = consumed
         }
 
-        // 3. Indikator Warna (Relatif terhadap target user)
+        // 3. Indikator Warna (PENTING: Cek kenapa masih hitam)
+        // Jika consumed (3000) <= targetUser (misal 3500), maka akan tetap HITAM.
         val color = when {
             consumed <= targetUser -> android.graphics.Color.BLACK // Aman
             consumed <= targetUser + 300 -> android.graphics.Color.parseColor("#FBC02D") // Kuning
@@ -261,7 +260,7 @@ class HomeActivity : AppCompatActivity() {
         }
         caloriesProgressBar.progressBarColor = color
 
-        // 4. Update Teks (Tetap jujur menampilkan angka asli meskipun bar sudah macet)
+        // 4. Update Teks (Tetap angka asli)
         tvCaloriesValue.text = consumed.toInt().toString()
     }
 
@@ -394,34 +393,45 @@ class HomeActivity : AppCompatActivity() {
 
     private fun checkAndResetDailyData() {
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
-        val lastDateStr = sharedPref.getString("last_opened_date", "")
 
         val calendar = Calendar.getInstance()
-        val currentDateStr = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        // Ambil info minggu dan tahun saat ini
+        val currentWeek = calendar.get(Calendar.WEEK_OF_YEAR)
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentDateStr = "${currentYear}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
 
+        // Ambil info terakhir kali aplikasi dibuka
+        val lastWeek = sharedPref.getInt("last_opened_week", -1)
+        val lastYear = sharedPref.getInt("last_opened_year", -1)
+        val lastDateStr = sharedPref.getString("last_opened_date", "")
+
+        val editor = sharedPref.edit()
+
+        // --- LOGIKA 1: RESET MINGGUAN (Pembersih Sampah Sabtu-Minggu) ---
+        // Jika minggu sudah berganti atau tahun sudah berganti
+        if (currentWeek != lastWeek || currentYear != lastYear) {
+            val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+            for (day in days) {
+                editor.putFloat("history_cal_$day", 0f) // Sapu bersih semua hari!
+            }
+            editor.putInt("last_opened_week", currentWeek)
+            editor.putInt("last_opened_year", currentYear)
+
+            // Pastikan list catatan harian juga bersih
+            editor.putString("daily_food_history", "")
+        }
+
+        // --- LOGIKA 2: RESET HARIAN (Home jadi 0) ---
         if (lastDateStr != "" && lastDateStr != currentDateStr) {
-            val editor = sharedPref.edit()
-
-            // --- 1. SEBELUM RESET, PINDAHKAN DATA KE GUDANG MINGGUAN ---
+            // Tabung data kemarin sebelum direset (Logika yang kita buat kemarin)
             val yesterdayCal = Calendar.getInstance()
             yesterdayCal.add(Calendar.DATE, -1)
-
-            // GUNAKAN java.util.Locale.US di bawah ini:
             val dayName = java.text.SimpleDateFormat("EEE", java.util.Locale.US).format(yesterdayCal.time)
 
-            val consumedCal = sharedPref.getFloat("consumed_calories", 0f)
-            editor.putFloat("history_cal_$dayName", consumedCal)
+            val consumedYesterday = sharedPref.getFloat("consumed_calories", 0f)
+            editor.putFloat("history_cal_$dayName", consumedYesterday)
 
-            // --- 2. JIKA HARI INI SENIN, RESET SELURUH GUDANG MINGGUAN ---
-            if (dayOfWeek == Calendar.MONDAY) {
-                val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-                for (day in days) {
-                    editor.putFloat("history_cal_$day", 0f)
-                }
-            }
-
-            // --- 3. RESET PARAMETER HARIAN DI HOME JADI 0 ---
+            // Reset semua counter harian
             editor.putFloat("consumed_calories", 0f)
             editor.putFloat("consumed_carbs", 0f)
             editor.putFloat("consumed_protein", 0f)
@@ -430,13 +440,15 @@ class HomeActivity : AppCompatActivity() {
             editor.putString("daily_food_history", "")
 
             editor.putString("last_opened_date", currentDateStr)
-            editor.apply()
-
-            setupCaloriesProgressBar()
-            setupNutrientsProgressBar()
         } else if (lastDateStr == "") {
-            sharedPref.edit().putString("last_opened_date", currentDateStr).apply()
+            editor.putString("last_opened_date", currentDateStr)
         }
+
+        editor.apply()
+
+        // Refresh tampilan jika perlu
+        setupCaloriesProgressBar()
+        setupNutrientsProgressBar()
     }
 
     private fun openCamera() {
@@ -454,7 +466,7 @@ class HomeActivity : AppCompatActivity() {
         ivPreview.setImageBitmap(bitmap)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            val cal = 250f
+            val cal = 200f
             val addCarbs = 30f
             val addProt = 25f
             val addSugar = 5f

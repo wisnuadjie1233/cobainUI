@@ -42,7 +42,7 @@
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/spacelight"
+                android:fontFamily="@font/actor"
                 app:layout_constraintStart_toEndOf="@+id/user_avatar"
                 app:layout_constraintTop_toTopOf="@+id/user_avatar"
                 app:layout_constraintBottom_toBottomOf="@+id/user_avatar" />
@@ -97,7 +97,7 @@
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/spacelight"
+                android:fontFamily="@font/actor"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/date_card" />
 
@@ -124,7 +124,7 @@
                     android:id="@+id/total_kalori_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/spacelight"
+                    android:fontFamily="@font/actor"
                     android:text="Total Kalori"
                     android:textStyle="bold"
                     android:textColor="#000000"
@@ -138,11 +138,11 @@
                     android:layout_height="205dp"
                     app:cpb_background_progressbar_color="@android:color/transparent"
                     app:cpb_progress="50"
-                    app:cpb_progress_max="100"
+                    app:cpb_progress_max="65"
                     app:cpb_progressbar_color="#000000"
                     app:cpb_progressbar_width="19dp"
                     app:cpb_round_border="true"
-                    app:cpb_start_angle="270"
+                    app:cpb_start_angle="222"
                     app:layout_constraintBottom_toBottomOf="@id/calories_background_bar"
                     app:layout_constraintEnd_toEndOf="@id/calories_background_bar"
                     app:layout_constraintStart_toStartOf="@id/calories_background_bar"
@@ -156,11 +156,11 @@
                     android:layout_marginTop="16dp"
                     app:cpb_background_progressbar_color="@android:color/transparent"
                     app:cpb_progress="50"
-                    app:cpb_progress_max="100"
+                    app:cpb_progress_max="65"
                     app:cpb_progressbar_color="#E1CDEE"
                     app:cpb_progressbar_width="16dp"
                     app:cpb_round_border="true"
-                    app:cpb_start_angle="270"
+                    app:cpb_start_angle="222"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/total_kalori_label" />
@@ -176,11 +176,39 @@
                     app:cpb_progressbar_color="#000000"
                     app:cpb_progressbar_width="16dp"
                     app:cpb_round_border="true"
-                    app:cpb_start_angle="270"
+                    app:cpb_start_angle="222"
                     app:layout_constraintBottom_toBottomOf="@id/calories_background_bar"
                     app:layout_constraintEnd_toEndOf="@id/calories_background_bar"
                     app:layout_constraintStart_toStartOf="@id/calories_background_bar"
                     app:layout_constraintTop_toTopOf="@id/calories_background_bar" />
+
+                <TextView
+                    android:id="@+id/tv_min_calories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="12sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/actor"
+                app:layout_constraintBottom_toBottomOf="@+id/calories_progress_bar"
+                app:layout_constraintEnd_toStartOf="@+id/calories_progress_bar"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="-35dp" />
+
+                <!-- Label Maksimal (Kanan) -->
+                <TextView
+                    android:id="@+id/tv_max_calories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2000"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:fontFamily="@font/actor"
+                    app:layout_constraintBottom_toBottomOf="@+id/calories_progress_bar"
+                    app:layout_constraintStart_toEndOf="@+id/calories_progress_bar"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="-35dp" />
+
                 <View
                     android:id="@+id/calories_text_background"
                     android:layout_width="150dp"
@@ -199,7 +227,7 @@
                     android:text="1672"
                     android:textColor="#000000"
                     android:textSize="24sp"
-                    android:fontFamily="@font/spacelight"
+                    android:fontFamily="@font/actor"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/calories_text_background"
                     app:layout_constraintEnd_toEndOf="@+id/calories_text_background"
@@ -215,7 +243,7 @@
                     android:text="Kalori"
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:fontFamily="@font/spacelight"
+                    android:fontFamily="@font/actor"
                     app:layout_constraintEnd_toEndOf="@+id/calories_text"
                     app:layout_constraintStart_toStartOf="@+id/calories_text"
                     app:layout_constraintTop_toBottomOf="@+id/calories_text" />
@@ -264,7 +292,7 @@
                             android:layout_marginTop="8dp"
                             android:text="Karbohidrat"
                             android:textColor="#000000"
-                            android:fontFamily="@font/spacelight"
+                            android:fontFamily="@font/actor"
                             android:textStyle="bold"
                             app:layout_constraintTop_toBottomOf="@+id/carbs_icon"
                             app:layout_constraintStart_toStartOf="parent" />
@@ -284,6 +312,7 @@
                             android:id="@+id/carbs_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/actor"
                             android:layout_marginTop="4dp"
                             android:text="140g"
                             android:textColor="#000000"
@@ -324,7 +353,7 @@
                             android:layout_marginTop="8dp"
                             android:text="Protein"
                             android:textColor="#000000"
-                            android:fontFamily="@font/spacelight"
+                            android:fontFamily="@font/actor"
                             android:textStyle="bold"
                             app:layout_constraintTop_toBottomOf="@+id/protein_icon"
                             app:layout_constraintStart_toStartOf="parent" />
@@ -343,6 +372,7 @@
                             android:id="@+id/protein_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/actor"
                             android:layout_marginTop="4dp"
                             android:text="60g"
                             android:textColor="#000000"
