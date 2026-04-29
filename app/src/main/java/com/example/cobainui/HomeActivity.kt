@@ -4,7 +4,9 @@ import android.widget.ProgressBar
 import android.view.View
 import android.provider.MediaStore
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -29,6 +31,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var greetingText: TextView
     private var backPressedOnce = false
+    private lateinit var foodClassifier: FoodClassifier
 
     // Peluncur Izin Kamera
     private val requestCameraPermissionLauncher = registerForActivityResult(
@@ -37,13 +40,28 @@ class HomeActivity : AppCompatActivity() {
         if (isGranted) openCamera() else Toast.makeText(this, "Izin kamera ditolak", Toast.LENGTH_SHORT).show()
     }
 
-    // Peluncur Tangkap Hasil Foto
+    // Peluncur Tangkap Hasil Foto Kamera
     private val takePictureLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
-            val bitmap = result.data?.extras?.get("data") as? android.graphics.Bitmap
+            val bitmap = result.data?.extras?.get("data") as? Bitmap
             bitmap?.let { showScanningResultSheet(it) }
+        }
+    }
+
+    // Peluncur Pilih Gambar dari Galeri
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                val inputStream = contentResolver.openInputStream(it)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                bitmap?.let { b -> showScanningResultSheet(b) }
+            } catch (e: Exception) {
+                Toast.makeText(this, "Gagal memuat gambar", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -52,45 +70,37 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // Pastikan ID 'notification_icon' sesuai dengan yang ada di activity_home.xml kamu
         val notificationIcon = findViewById<ImageView>(R.id.notification_icon)
 
         notificationIcon.setOnClickListener {
-            // Intent untuk pindah halaman dari Home ke Notification
             val intent = Intent(this, NotificationActivity::class.java)
             startActivity(intent)
         }
 
-        // --- INISIALISASI & HUBUNGKAN KOMPONEN ---
         auth = FirebaseAuth.getInstance()
-        // Pastikan ID di activity_home.xml Anda sesuai
         greetingText = findViewById(R.id.greeting_text)
+        foodClassifier = FoodClassifier(this)
 
-        // Logika Klik Avatar untuk Tamu
         val userAvatar = findViewById<ImageView>(R.id.user_avatar)
 
         userAvatar.setOnClickListener {
             val currentUser = FirebaseAuth.getInstance().currentUser
-
-            // Cek: Jika user NULL atau dia login secara Anonim (Tamu)
             if (currentUser == null || currentUser.isAnonymous) {
-                showGuestProfileSheet() // Munculkan popup login yang lama
+                showGuestProfileSheet()
             } else {
-                // JIKA SUDAH LOGIN: Langsung ke Edit Profil
                 val intent = Intent(this, EditProfileActivity::class.java)
                 startActivity(intent)
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             }
         }
 
-        // --- PANGGIL SEMUA FUNGSI SETUP ---
         setupGreeting()
         setupDateRecyclerView()
         setupCaloriesProgressBar()
         setupNutrientsProgressBar()
         setupBackButtonHandler()
-        setupCustomNavigation() // <-- Memanggil fungsi navigasi baru
-        checkAndResetDailyData() // <-- Memanggil fungsi reset data harian
+        setupCustomNavigation()
+        checkAndResetDailyData()
     }
 
     private fun showGuestProfileSheet() {
@@ -116,42 +126,20 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        // 1. Refresh data user agar nama update
         setupGreeting()
         setupCaloriesProgressBar()
         setupNutrientsProgressBar()
 
-        // 2. RESET TOTAL STATUS NAVIGASI (Solusi Masalahmu)
-        val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
-        val navAiIcon = findViewById<ImageView>(R.id.nav_ai_icon)
-        val navScanIcon = findViewById<ImageView>(R.id.nav_scan_icon) // Ikon nomor 3
-        val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
-        val navSettingsIcon = findViewById<ImageView>(R.id.nav_settings_icon)
-
-        // Paksa semua false dulu
-        navAiIcon.isSelected = false
-        navScanIcon.isSelected = false
-        navHistoryIcon.isSelected = false
-        navSettingsIcon.isSelected = false
-
-        // Paksa Home true
-        navHomeIcon.isSelected = true
-    }
-
-    private fun resetNavigationToHome() {
         val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
         val navAiIcon = findViewById<ImageView>(R.id.nav_ai_icon)
         val navScanIcon = findViewById<ImageView>(R.id.nav_scan_icon)
         val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
         val navSettingsIcon = findViewById<ImageView>(R.id.nav_settings_icon)
 
-
         navAiIcon.isSelected = false
         navScanIcon.isSelected = false
         navHistoryIcon.isSelected = false
         navSettingsIcon.isSelected = false
-
         navHomeIcon.isSelected = true
     }
 
@@ -166,16 +154,13 @@ class HomeActivity : AppCompatActivity() {
         }
 
         if (currentUser != null) {
-            // Jika user LOGIN
             val userName = currentUser.displayName ?: "User"
             greetingText.text = "$greeting $userName"
         } else {
-            // Jika user TEKAN LEWATI (Tamu)
-            greetingText.text = "$greeting Tamu" // <--- Pastikan cuma ini
+            greetingText.text = "$greeting Tamu"
         }
     }
 
-    // Di dalam HomeActivity.kt
     private fun setupDateRecyclerView() {
         val dateRecyclerView = findViewById<RecyclerView>(R.id.date_recycler_view)
         dateRecyclerView.layoutManager =
@@ -185,7 +170,6 @@ class HomeActivity : AppCompatActivity() {
         val adapter = DateAdapter(dates)
         dateRecyclerView.adapter = adapter
 
-        // Otomatis tandai dan scroll ke tanggal hari ini
         val todayCalendar = Calendar.getInstance()
         val todayPosition = dates.indexOfFirst {
             it.date.get(Calendar.YEAR) == todayCalendar.get(Calendar.YEAR) &&
@@ -195,22 +179,15 @@ class HomeActivity : AppCompatActivity() {
         if (todayPosition != -1) {
             dates[todayPosition].isSelected = true
             adapter.notifyItemChanged(todayPosition)
-            // Scroll ke posisi hari ini agar terlihat di layar
             dateRecyclerView.scrollToPosition(todayPosition)
         }
     }
 
-
-    // Di dalam HomeActivity.kt+
     private fun getWeekDates(): List<DateItem> {
         val dates = mutableListOf<DateItem>()
-        val calendar = Calendar.getInstance() // Mulai dari tanggal hari ini
-
-        // Atur kalender ke hari pertama minggu ini (misalnya, Senin)
+        val calendar = Calendar.getInstance()
         calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-
-        // Buat daftar 7 hari dari Senin hingga Minggu
         for (i in 0..6) {
             dates.add(DateItem(calendar.clone() as Calendar))
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -225,66 +202,43 @@ class HomeActivity : AppCompatActivity() {
 
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
         val consumed = sharedPref.getFloat("consumed_calories", 0f)
-
-        // Ambil target hasil hitungan profil, default 2000f jika belum ada data
         val targetUser = sharedPref.getFloat("daily_target_calories", 2000f)
         tvMaxLabel.text = targetUser.toInt().toString()
-        // 1. Batas Macet (Bar berhenti bergerak secara visual tepat di target user)
         val batasMacet = targetUser
-
-        // 2. Target Full (Kapasitas total wadah grafik/track ungu)
-        // Rumusmu: Target + 30%. Kita paksa ke Float agar tidak error merah
         val targetFull = (targetUser + (targetUser * 0.3f)).toFloat()
 
-        // --- IMPLEMENTASI KE PROGRESS BAR ---
-
-        // Set kapasitas maksimal wadah
         caloriesProgressBar.progressMax = targetFull
-
-        // Logika STUCK (Visual Clamping)
         if (consumed >= batasMacet) {
-            // Bar berhenti di ujung target (tidak meluber ke area 30% tambahan)
             caloriesProgressBar.progress = batasMacet
         } else {
-            // Gerakkan bar secara normal
             caloriesProgressBar.progress = consumed
         }
 
-        // 3. Indikator Warna (PENTING: Cek kenapa masih hitam)
-        // Jika consumed (3000) <= targetUser (misal 3500), maka akan tetap HITAM.
         val color = when {
-            consumed <= targetUser -> android.graphics.Color.BLACK // Aman
-            consumed <= targetUser + 300 -> android.graphics.Color.parseColor("#FBC02D") // Kuning
-            consumed <= targetUser + 600 -> android.graphics.Color.parseColor("#F57C00") // Oren
-            else -> android.graphics.Color.parseColor("#D32F2F") // Merah
+            consumed <= targetUser -> android.graphics.Color.BLACK
+            consumed <= targetUser + 300 -> android.graphics.Color.parseColor("#FBC02D")
+            consumed <= targetUser + 600 -> android.graphics.Color.parseColor("#F57C00")
+            else -> android.graphics.Color.parseColor("#D32F2F")
         }
         caloriesProgressBar.progressBarColor = color
-
-        // 4. Update Teks (Tetap angka asli)
         tvCaloriesValue.text = consumed.toInt().toString()
     }
 
     private fun setupNutrientsProgressBar() {
-        // Hubungkan komponen dari XML
         val carbsProgress = findViewById<ProgressBar>(R.id.carbs_progress)
         val tvCarbsValue = findViewById<TextView>(R.id.carbs_value)
         val proteinProgress = findViewById<ProgressBar>(R.id.protein_progress)
         val tvProteinValue = findViewById<TextView>(R.id.protein_value)
 
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
-
-        // Ambil data nutrisi
         val consumedCarbs = sharedPref.getFloat("consumed_carbs", 0f)
         val consumedProtein = sharedPref.getFloat("consumed_protein", 0f)
 
-        // --- LOGIKA KARBOHIDRAT (Target 300g) ---
         val targetCarbs = 300
         carbsProgress.max = targetCarbs
-        // Gunakan logika 'stuck' agar tidak meluber
         carbsProgress.progress = if (consumedCarbs > targetCarbs) targetCarbs else consumedCarbs.toInt()
         tvCarbsValue.text = "${consumedCarbs.toInt()}g"
 
-        // --- LOGIKA PROTEIN (Target 100g) ---
         val targetProtein = 100
         proteinProgress.max = targetProtein
         proteinProgress.progress = if (consumedProtein > targetProtein) targetProtein else consumedProtein.toInt()
@@ -318,43 +272,32 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupCustomNavigation() {
-        // 1. Hubungkan semua ImageView ikon dari layout ke variabel
         val navHomeIcon = findViewById<ImageView>(R.id.nav_home_icon)
         val navAiIcon = findViewById<ImageView>(R.id.nav_ai_icon)
         val navScanIcon = findViewById<ImageView>(R.id.nav_scan_icon)
         val navHistoryIcon = findViewById<ImageView>(R.id.nav_history_icon)
         val navSettingsIcon = findViewById<ImageView>(R.id.nav_settings_icon)
 
-        // Jadikan semua ikon dalam sebuah list agar mudah dikelola
         val navIcons = listOf(navHomeIcon, navAiIcon, navScanIcon, navHistoryIcon, navSettingsIcon)
 
-        // Fungsi bantuan untuk menonaktifkan semua ikon
         fun clearSelection() {
             navIcons.forEach { it.isSelected = false }
         }
 
-        // 2. Set item Home sebagai yang aktif saat pertama kali halaman dibuka
         navHomeIcon.isSelected = true
 
-        // 3. Tambahkan OnClickListener untuk setiap ikon
         navHomeIcon.setOnClickListener {
-            if (!it.isSelected) { // Hanya jalankan jika belum dipilih
+            if (!it.isSelected) {
                 clearSelection()
                 it.isSelected = true
-                // TODO: Tampilkan Fragment atau konten untuk Home
             }
         }
 
-
         navAiIcon.setOnClickListener {
-                // Kita tidak perlu seleksi oranye untuk kamera, langsung buka saja
-                requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+            showImageSourceOptions()
         }
 
         navScanIcon.setOnClickListener {
-            // Hapus pengecekan 'if (!it.isSelected)' khusus untuk navigasi antar halaman
-            // Agar setiap kali ditekan, dia PASTI pindah tanpa peduli status sebelumnya.
-
             val intent = Intent(this, AnalysisHistoryActivity::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
@@ -362,17 +305,10 @@ class HomeActivity : AppCompatActivity() {
 
         navHistoryIcon.setOnClickListener {
             if (!it.isSelected) {
-                // 1. Bersihkan seleksi ikon lain
                 navIcons.forEach { icon -> icon.isSelected = false }
-
-                // 2. Tandai ikon ini sebagai terpilih (nyala oranye)
                 it.isSelected = true
-
-                // 3. PINDAH KE HALAMAN EDUKASI
                 val intent = Intent(this, EducationActivity::class.java)
                 startActivity(intent)
-
-                // 4. ANIMASI SLIDE
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             }
         }
@@ -381,72 +317,79 @@ class HomeActivity : AppCompatActivity() {
             if (!it.isSelected) {
                 clearSelection()
                 it.isSelected = true
-                // PINDAH HALAMAN KE SETTINGS
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
-                // ANIMASI SLIDE
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             }
         }
+    }
 
+    private fun showImageSourceOptions() {
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_image_source_selection, null)
+
+        val btnCamera = view.findViewById<View>(R.id.option_camera)
+        val btnGallery = view.findViewById<View>(R.id.option_gallery)
+
+        btnCamera?.setOnClickListener {
+            dialog.dismiss()
+            requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
+
+        btnGallery?.setOnClickListener {
+            dialog.dismiss()
+            openGallery()
+        }
+
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    private fun openGallery() {
+        pickImageLauncher.launch("image/*")
     }
 
     private fun checkAndResetDailyData() {
         val sharedPref = getSharedPreferences("UserStats", MODE_PRIVATE)
-
         val calendar = Calendar.getInstance()
-        // Ambil info minggu dan tahun saat ini
         val currentWeek = calendar.get(Calendar.WEEK_OF_YEAR)
         val currentYear = calendar.get(Calendar.YEAR)
         val currentDateStr = "${currentYear}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
 
-        // Ambil info terakhir kali aplikasi dibuka
         val lastWeek = sharedPref.getInt("last_opened_week", -1)
         val lastYear = sharedPref.getInt("last_opened_year", -1)
         val lastDateStr = sharedPref.getString("last_opened_date", "")
 
         val editor = sharedPref.edit()
 
-        // --- LOGIKA 1: RESET MINGGUAN (Pembersih Sampah Sabtu-Minggu) ---
-        // Jika minggu sudah berganti atau tahun sudah berganti
         if (currentWeek != lastWeek || currentYear != lastYear) {
             val days = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
             for (day in days) {
-                editor.putFloat("history_cal_$day", 0f) // Sapu bersih semua hari!
+                editor.putFloat("history_cal_$day", 0f)
             }
             editor.putInt("last_opened_week", currentWeek)
             editor.putInt("last_opened_year", currentYear)
-
-            // Pastikan list catatan harian juga bersih
             editor.putString("daily_food_history", "")
         }
 
-        // --- LOGIKA 2: RESET HARIAN (Home jadi 0) ---
         if (lastDateStr != "" && lastDateStr != currentDateStr) {
-            // Tabung data kemarin sebelum direset (Logika yang kita buat kemarin)
             val yesterdayCal = Calendar.getInstance()
             yesterdayCal.add(Calendar.DATE, -1)
             val dayName = java.text.SimpleDateFormat("EEE", java.util.Locale.US).format(yesterdayCal.time)
-
             val consumedYesterday = sharedPref.getFloat("consumed_calories", 0f)
             editor.putFloat("history_cal_$dayName", consumedYesterday)
 
-            // Reset semua counter harian
             editor.putFloat("consumed_calories", 0f)
             editor.putFloat("consumed_carbs", 0f)
             editor.putFloat("consumed_protein", 0f)
             editor.putFloat("consumed_sugar", 0f)
             editor.putFloat("consumed_fat", 0f)
             editor.putString("daily_food_history", "")
-
             editor.putString("last_opened_date", currentDateStr)
         } else if (lastDateStr == "") {
             editor.putString("last_opened_date", currentDateStr)
         }
-
         editor.apply()
-
-        // Refresh tampilan jika perlu
         setupCaloriesProgressBar()
         setupNutrientsProgressBar()
     }
@@ -456,7 +399,7 @@ class HomeActivity : AppCompatActivity() {
         takePictureLauncher.launch(intent)
     }
 
-    private fun showScanningResultSheet(bitmap: android.graphics.Bitmap) {
+    private fun showScanningResultSheet(bitmap: Bitmap) {
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.layout_scanning_result, null)
         val ivPreview = view.findViewById<ImageView>(R.id.iv_scan_preview)
@@ -466,14 +409,17 @@ class HomeActivity : AppCompatActivity() {
         ivPreview.setImageBitmap(bitmap)
 
         Handler(Looper.getMainLooper()).postDelayed({
+            // 1. Klasifikasikan gambar menggunakan AI
+            val detectedFood = foodClassifier.classify(bitmap)
+
             val cal = 200f
             val addCarbs = 30f
             val addProt = 25f
             val addSugar = 5f
             val addFat = 12f
 
-            // --- 1. UPDATE TEKS PREVIEW (PASTIKAN MUNCUL 4 BARIS) ---
-            tvStatus.text = "Terdeteksi: Dada Ayam Bakar\n" +
+            // 2. Tampilkan Nama Makanan hasil AI
+            tvStatus.text = "Terdeteksi: $detectedFood\n" +
                     "Estimasi: ${cal.toInt()} kkal\n" +
                     "Carbs: ${addCarbs.toInt()}g | Prot: ${addProt.toInt()}g\n" +
                     "Sugar: ${addSugar.toInt()}g | Fat: ${addFat.toInt()}g"
@@ -483,27 +429,18 @@ class HomeActivity : AppCompatActivity() {
             btnAdd.setOnClickListener {
                 val pref = getSharedPreferences("UserStats", MODE_PRIVATE)
                 val editor = pref.edit()
-
                 val sdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
                 val currentTime = sdf.format(java.util.Date())
-
-                // --- 2. UPDATE CATATAN HARIAN AGAR LENGKAP (5 NUTRISI) ---
-                // Format: Nama|Jam|Kalori|Carbs|Prot|Sugar|Fat
-                val foodEntry = "Dada Ayam Bakar|$currentTime|${cal.toInt()} kkal|${addCarbs.toInt()}g C|${addProt.toInt()}g P"
-
+                val foodEntry = "$detectedFood|$currentTime|${cal.toInt()} kkal|${addCarbs.toInt()}g C|${addProt.toInt()}g P"
                 val oldHistory = pref.getString("daily_food_history", "")
                 val newHistory = if (oldHistory.isNullOrEmpty()) foodEntry else "$oldHistory#$foodEntry"
                 editor.putString("daily_food_history", newHistory)
-
-                // --- 3. SIMPAN ANGKA AKUMULASI ---
                 editor.putFloat("consumed_calories", pref.getFloat("consumed_calories", 0f) + cal)
                 editor.putFloat("consumed_carbs", pref.getFloat("consumed_carbs", 0f) + addCarbs)
                 editor.putFloat("consumed_protein", pref.getFloat("consumed_protein", 0f) + addProt)
                 editor.putFloat("consumed_sugar", pref.getFloat("consumed_sugar", 0f) + addSugar)
                 editor.putFloat("consumed_fat", pref.getFloat("consumed_fat", 0f) + addFat)
-
                 editor.apply()
-
                 setupCaloriesProgressBar()
                 setupNutrientsProgressBar()
                 dialog.dismiss()
