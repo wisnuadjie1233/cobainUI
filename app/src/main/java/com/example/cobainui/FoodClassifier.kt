@@ -2,59 +2,79 @@ package com.example.cobainui
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
+import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
+import org.tensorflow.lite.support.common.ops.NormalizeOp
+import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.task.vision.classifier.ImageClassifier
+import org.tensorflow.lite.support.image.ops.ResizeOp
+import java.nio.MappedByteBuffer
 
 class FoodClassifier(val context: Context) {
 
-    private var classifier: ImageClassifier? = null
+    private var interpreter: Interpreter? = null
     private var labels: List<String> = listOf()
+    private val inputImageSize = 224 // Teachable Machine standar pakai 224x224
 
     init {
-        val options = ImageClassifier.ImageClassifierOptions.builder()
-            .setMaxResults(1)
-            .setScoreThreshold(0.0f) // Set ke 0.0 agar menampilkan hasil apa pun yang paling mirip
-            .build()
-
         try {
-            // 1. Load Model
-            classifier = ImageClassifier.createFromFileAndOptions(
-                context, "model.tflite", options
-            )
-            // 2. Load Labels secara manual dari assets/labels.txt
-            labels = FileUtil.loadLabels(context, "labels.txt")
+            // 1. Load model.tflite
+            val modelBuffer: MappedByteBuffer = FileUtil.loadMappedFile(context, "model.tflite")
+            interpreter = Interpreter(modelBuffer)
+
+            // 2. Load labels.txt
+            val labelsRaw = FileUtil.loadLabels(context, "labels.txt")
+            // Bersihkan format label (misal "1 baso" -> "baso")
+            labels = labelsRaw.map { it.replace(Regex("^[0-9]+\\s*"), "").trim() }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun classify(bitmap: Bitmap): String {
-        if (classifier == null) return "Model Error"
+        val currentInterpreter = interpreter ?: return "Model Error"
 
-        val tensorImage = TensorImage.fromBitmap(bitmap)
-        val results = classifier?.classify(tensorImage)
+        try {
+            // --- PERBAIKAN NORMALISASI (Sesuai Teachable Machine) ---
+            // Teachable Machine menggunakan range -1 sampai 1
+            // Rumus: (pixel - 127.5) / 127.5
+            val imageProcessor = ImageProcessor.Builder()
+                .add(ResizeOp(inputImageSize, inputImageSize, ResizeOp.ResizeMethod.BILINEAR))
+                .add(NormalizeOp(127.5f, 127.5f)) 
+                .build()
 
-        val category = results?.firstOrNull()?.categories?.firstOrNull()
+            // 2. Load Bitmap ke TensorImage
+            var tensorImage = TensorImage(currentInterpreter.getInputTensor(0).dataType())
+            tensorImage.load(bitmap)
+            tensorImage = imageProcessor.process(tensorImage)
 
-        // Log untuk melihat hasil deteksi di Logcat (Ketik 'FoodAI' di filter Logcat)
-        category?.let {
-            Log.d("FoodAI", "AI melihat: ${it.label} (Index: ${it.index}, Skor: ${it.score})")
-        }
+            // 3. Siapkan wadah output
+            val outputBuffer = Array(1) { FloatArray(labels.size) }
 
-        return if (category != null) {
-            // Jika label di model kosong, gunakan index untuk ambil dari labels.txt
-            val labelRaw = if (category.label.isNullOrEmpty()) {
-                if (category.index < labels.size) labels[category.index] else "Unknown Index"
-            } else {
-                category.label
-            }
+            // 4. Jalankan AI
+            currentInterpreter.run(tensorImage.buffer, outputBuffer)
+
+            // 5. Cari skor tertinggi
+            val scores = outputBuffer[0]
+            var maxIdx = -1
+            var maxScore = -1f
             
-            // Bersihkan angka di depan (misal "1 baso" jadi "baso")
-            labelRaw.replace(Regex("^[0-9]+\\s*"), "").replaceFirstChar { it.uppercase() }
-        } else {
-            "Tidak Dikenali"
+            for (i in scores.indices) {
+                if (scores[i] > maxScore) {
+                    maxScore = scores[i]
+                    maxIdx = i
+                }
+            }
+
+            // 6. Ambil nama makanan (Threshold 0.5 agar lebih akurat)
+            return if (maxIdx != -1 && maxScore > 0.5f) {
+                labels[maxIdx].replaceFirstChar { it.uppercase() }
+            } else {
+                "Tidak Dikenali"
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return "Error Klasifikasi"
         }
     }
 }
