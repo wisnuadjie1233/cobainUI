@@ -1,62 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?android:attr/windowBackground"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:background="@android:color/white">
+    android:padding="28dp">
+
+    <!-- Modern Drag Handle -->
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="28dp"
+        android:background="#D1D1D6" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:fontFamily="@font/actor"
         android:text="Pilih Sumber Gambar"
-        android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="20dp" />
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="20sp" />
 
     <LinearLayout
-        android:id="@+id/option_camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="15dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground">
+        android:weightSum="2">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_camera" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Camera Option Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/option_camera"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Kamera"
-            android:textSize="16sp"
-            android:layout_marginStart="15dp" />
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFF5F0"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginBottom="12dp"
+                    android:src="@android:drawable/ic_menu_camera"
+                    app:tint="#FF5A16" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Kamera"
+                    android:textColor="#FF5A16"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Gallery Option Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/option_gallery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#F0F7FF"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginBottom="12dp"
+                    android:src="@android:drawable/ic_menu_gallery"
+                    app:tint="#007AFF" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Galeri"
+                    android:textColor="#007AFF"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/option_gallery"
+    <TextView
+        android:id="@+id/btn_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="15dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground">
+        android:layout_marginTop="28dp"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="Batal"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#8E8E93"
+        android:textSize="15sp" />
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_gallery" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Galeri"
-            android:textSize="16sp"
-            android:layout_marginStart="15dp" />
-    </LinearLayout>
 </LinearLayout>
